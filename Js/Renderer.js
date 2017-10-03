@@ -2,8 +2,11 @@
 "use strict"
 
 //Constructor
-function Renderer()
+function Renderer(game)
 {
+	//Store a reference back to the game
+	this.game = game;
+
 	//Get the canvas to render to
 	this.canvas = document.querySelector("#glCanvas");
 	
@@ -24,7 +27,7 @@ function Renderer()
 
 
 //Render a frame
-Renderer.prototype.Draw = function(game)
+Renderer.prototype.Draw = function()
 {
 	//Clear to black
 	this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -32,9 +35,9 @@ Renderer.prototype.Draw = function(game)
 	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 	
 	//Draw all game objects
-	for(i in game.objects)
+	for(i in this.game.objects)
 	{
-		game.objects[i].Draw(game);
+		this.game.objects[i].Draw();
 	}
 }
 

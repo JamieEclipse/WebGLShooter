@@ -20,11 +20,10 @@ function Wall(game)
 Wall.prototype = Object.create(GameObject.prototype);
 Wall.prototype.constructor = Wall;
 
-Wall.prototype.Update = function() { }
 
-Wall.prototype.Draw = function(game)
+Wall.prototype.Draw = function()
 {
 	var modelMatrix = mat4.create();
 	mat4.translate(modelMatrix, modelMatrix, this.position);
-	game.renderer.DrawModel(this.model, this.shader, modelMatrix);
+	this.game.renderer.DrawModel(this.model, this.shader, modelMatrix);
 }

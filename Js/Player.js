@@ -82,7 +82,7 @@ Player.prototype.SetInputAction = function(down)
 
 
 //Main update - move, jump, shoot etc
-Player.prototype.Update = function(game, deltaTime)
+Player.prototype.Update = function(deltaTime)
 {
 	//Look controls
 	//TODO: Mouse look
@@ -108,24 +108,24 @@ Player.prototype.Update = function(game, deltaTime)
 	vec3.scaleAndAdd(this.position, this.position, this.velocity, deltaTime);
 	
 	//Move the camera
-	vec3.add(game.renderer.camera.position, this.position, this.cameraOffset);
-	game.renderer.camera.yaw = this.yaw;
+	vec3.add(this.game.renderer.camera.position, this.position, this.cameraOffset);
+	this.game.renderer.camera.yaw = this.yaw;
 	
 	//Suspend the game
 	if(this.buttons["Menu"] === true)
 	{
-		game.Suspend();
+		this.game.Suspend();
 	}
 }
 
 
 //Suspended update - spin slowly
-Player.prototype.UpdateSuspended = function(game, deltaTime)
+Player.prototype.UpdateSuspended = function(deltaTime)
 {
 	//Position camera
-	game.renderer.camera.position.set([0, 0, 2]);
+	this.game.renderer.camera.position.set([0, 0, 2]);
 	
 	//Slowly spin the camera
 	this.suspendedYawChangeAngle += deltaTime * 0.1;
-	game.renderer.camera.yaw = Math.sin(this.suspendedYawChangeAngle) * 1.0;
+	this.game.renderer.camera.yaw = Math.sin(this.suspendedYawChangeAngle) * 1.0;
 }

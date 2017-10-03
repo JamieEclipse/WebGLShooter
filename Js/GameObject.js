@@ -4,16 +4,19 @@
 
 function GameObject(game)
 {
+	//Store a reference back to the game
+	this.game = game;
+
 	this.position = vec3.create();
 	this.velocity = vec3.create();
 }
 
 
-GameObject.prototype.Update = function(game, deltaTime) { }
+GameObject.prototype.Update = function(deltaTime) { }
 
 
 //Alternative update loop to call when the game is suspended (i.e. unfocused)
-GameObject.prototype.UpdateSuspended = function(game, deltaTime) { };
+GameObject.prototype.UpdateSuspended = function(deltaTime) { };
 
 
 GameObject.prototype.Draw = function(gl) { }

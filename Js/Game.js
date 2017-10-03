@@ -6,7 +6,7 @@ function Game()
 	//TODO: Pause - another bool or switch to an "enum"?
 	
 	//Initialise renderer
-	this.renderer = new Renderer();
+	this.renderer = new Renderer(this);
 	
 	//Named callback arrays for communication inside and outside of the game
 	this.events = { };
@@ -65,11 +65,11 @@ Game.prototype.Update = function(deltaTime, updateType)
 	//Update all game objects
 	for(i in this.objects)
 	{
-		this.objects[i][updateType](this, deltaTime);
+		this.objects[i][updateType](deltaTime);
 	}
 	
 	//Render
-	this.renderer.Draw(this);
+	this.renderer.Draw();
 }
 
 
