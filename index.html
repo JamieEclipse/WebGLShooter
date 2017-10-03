@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- Prevent caching -->
+		<!-- TODO: remove this in 'release' versions? -->
+		<meta http-equiv="cache-control" content="max-age=0" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+		<meta http-equiv="pragma" content="no-cache" />
+		
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		
+		<!-- Bootstrap CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+		<link rel="stylesheet" href="Styles.css">
+	</head>
+
+	<body>
+		<!-- Game canvas - behind the page -->
+		<canvas id="glCanvas"></canvas>
+		
+		<div class="container main" id="content" style="background: rgba(255, 255, 255, 1.0);">
+			<div>
+				<h1 class="display-1 text-center">Portfolio</h1>
+				<p class="lead">Content here</p>
+				
+				<!-- Button to hide page (to show the game) -->
+				<h5 class="display-5">WebGL Game</h1>
+				
+				<!-- Temporary text -->
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mollis elit metus, sit amet efficitur erat semper et. Maecenas sed enim sem. Fusce et nisi augue. Aliquam bibendum eleifend bibendum. Sed molestie orci et sapien faucibus scelerisque. Aenean eu orci vitae ante consequat hendrerit id sed libero. Morbi id ligula faucibus, convallis purus ac, mattis massa. Curabitur vitae cursus sem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+				<p>
+					<button type="button" onclick="Launcher.ShowGame();">Show game.</button>
+				</p>
+				<p>Donec vitae sollicitudin urna. Sed malesuada tellus ac ante egestas, eget dignissim urna maximus. Donec id suscipit diam. Vestibulum non urna imperdiet ex tempus volutpat eu et nibh. Nunc vel lacus lectus. Integer ut diam arcu. Pellentesque ullamcorper nunc et leo dapibus, vel vehicula odio ultricies. Maecenas accumsan nisi sit amet odio scelerisque ullamcorper. Sed tempus ac libero vel sodales. Duis sit amet vehicula dolor. Etiam non risus mi. Integer porttitor nisl dolor, a mollis lacus scelerisque eu.</p>
+				<p>Aliquam mollis tristique lacus, sit amet porttitor orci porta vel. Cras id venenatis dolor, sit amet sagittis purus. Nunc suscipit orci at ornare ornare. Duis id fringilla nisi. Fusce porta, lacus efficitur ullamcorper convallis, ex magna varius quam, et rhoncus massa nisi non justo. Cras tempor nibh in pharetra efficitur. Sed a scelerisque sapien. Fusce feugiat at libero nec pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vestibulum vel iaculis libero. Sed blandit ac arcu ut blandit. Aenean rutrum lorem quam, vehicula mattis nunc ullamcorper ut.</p>
+				<p>Vestibulum elementum lorem sit amet luctus varius. Ut ultrices tortor eget ultrices sagittis. Nulla hendrerit bibendum vestibulum. Sed vitae finibus diam, non efficitur ex. Etiam eget diam eu urna scelerisque sodales. Sed ac turpis ultricies, placerat lorem sit amet, viverra felis. Curabitur imperdiet arcu eget tincidunt finibus. Sed consectetur elit nec mattis facilisis. Morbi vel imperdiet ex.</p>
+				<p>Nulla sem erat, semper eget luctus eu, dignissim pharetra eros. Vivamus sollicitudin nulla vel libero aliquam fermentum. Etiam efficitur ipsum ac lacus vulputate viverra. Vestibulum porta lacus quis mi porttitor, at fermentum leo vulputate. Sed a nisl odio. Morbi magna lorem, laoreet id velit a, rhoncus pulvinar sapien. Vestibulum tempus eget ipsum sit amet rutrum. Curabitur imperdiet fringilla diam eget convallis. Sed eget diam efficitur, luctus orci ut, malesuada arcu. Suspendisse ultricies finibus cursus. Vestibulum vehicula, odio sit amet aliquam maximus, est elit accumsan felis, sit amet faucibus arcu nunc at erat. Sed dignissim lorem a justo egestas, sit amet gravida elit consectetur. Donec ut volutpat neque, non molestie elit.</p>
+				<p>Etiam ultricies quis mi ac malesuada. Suspendisse nec faucibus lorem. Aliquam eget urna orci. Sed ex lectus, imperdiet et porta vel, aliquam ac elit. Suspendisse porttitor cursus varius. Duis efficitur pretium massa sed dignissim. Etiam commodo tortor vel justo ornare egestas. Quisque ac convallis arcu. Etiam vestibulum ante sit amet rhoncus tincidunt. Mauris ex libero, porttitor sit amet dolor eget, cursus tristique quam. Donec cursus sit amet est in bibendum.</p>
+				<p>Nullam sed purus dui. Etiam at ultrices diam. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Phasellus gravida eu ipsum eget scelerisque. Morbi eu condimentum dolor, in tincidunt velit. Ut pellentesque nunc lectus. Nulla semper purus justo, vitae molestie enim dapibus a. Integer rutrum neque at libero luctus, sed accumsan urna aliquam. Fusce dolor turpis, pharetra vitae nisi ut, ultrices pharetra eros. Fusce sodales, sapien at imperdiet ornare, diam est semper nibh, eu efficitur turpis magna in dolor. Etiam et magna justo. Donec rutrum nunc nunc, a venenatis tortor ullamcorper non. Etiam volutpat fringilla ante sit amet bibendum. Vivamus fringilla leo eget lacus efficitur pulvinar. Sed dignissim diam ex, ac dictum justo blandit sed.</p>
+				<p>Pellentesque dapibus libero pulvinar, dapibus nisi cursus, hendrerit tortor. Aliquam vehicula sed justo ut rutrum. Mauris eu pretium quam. Donec lobortis feugiat erat a imperdiet. Ut sed dolor quis diam rhoncus feugiat at in ante. Aliquam accumsan, ante non placerat porta, diam tellus semper erat, non pretium lorem diam a diam. Etiam porta rutrum ultrices. Ut nec libero quis dui interdum accumsan. Quisque a ullamcorper massa. Vivamus et orci eu sem eleifend condimentum vel sit amet tortor. Quisque est diam, imperdiet in purus nec, efficitur posuere dolor. Nunc ultricies nisi non mattis convallis. Praesent consectetur id leo sed varius. Mauris pulvinar est dignissim odio efficitur, vel lobortis orci accumsan. Integer tempor ultrices massa, id vulputate nunc. Ut elementum sem ex, ac mattis lacus volutpat eget.</p>
+				<p>Etiam rutrum enim vel orci tempor viverra. Sed gravida at dolor vel condimentum. Etiam in mauris id nulla pellentesque sollicitudin. Duis tempus orci et augue dapibus, quis consectetur tellus vestibulum. Duis ut accumsan nunc. Phasellus rhoncus a purus vitae convallis. Nam a justo convallis, sollicitudin tortor dignissim, sodales tellus. Morbi rhoncus tellus quis pulvinar suscipit. Mauris ut arcu non massa tristique interdum. Curabitur a purus quis arcu imperdiet consequat. Vestibulum et posuere eros, nec sagittis enim. Cras sapien eros, malesuada at eleifend ut, placerat eu lectus. Suspendisse vitae velit hendrerit, sollicitudin lectus sit amet, congue lacus.</p>
+				<p>Cras interdum vel nisl in commodo. Integer ac sollicitudin libero, dignissim posuere nibh. Sed consequat, mi sed vehicula lobortis, neque nisi suscipit massa, eu interdum massa tellus id mauris. Suspendisse elementum consequat libero vitae accumsan. Mauris tellus lacus, venenatis vel neque et, venenatis malesuada urna. Mauris ut mi augue. In vulputate lorem tortor, in congue velit hendrerit nec. Vestibulum vitae sapien sodales, porttitor turpis eget, sagittis eros. Morbi vitae pretium dui. Sed auctor suscipit arcu eu pretium. Ut dapibus tempus lectus, in pharetra nibh blandit sed. Quisque non iaculis odio. Nam viverra magna vitae quam fringilla consequat. Fusce consequat, sapien sit amet egestas rutrum, diam risus vehicula libero, non porttitor urna tortor ac lorem.</p>
+				
+			</div>
+			
+			<div>Footer</div>
+		</div>
+
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="http://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+		<!-- <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script> -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+		
+		<!-- Game includes -->
+		<script src="Js/Camera.js"></script>
+		<script src="Js/Game.js"></script>
+		<script src="Js/GameObject.js"></script>
+		<script src="Js/Model.js"></script>
+		<script src="Js/Player.js"></script>
+		<script src="Js/Renderer.js"></script>
+		<script src="Js/Shader.js"></script>
+		<script src="Js/Texture.js"></script>
+		<script src="Js/Wall.js"></script>
+		<script src="Js/Lib/gl-matrix.js"></script>
+		
+		<!-- Run the game -->
+		<script>
+			var Launcher = new function()
+			{
+				//Get content window
+				this.content = $('#content');
+				this.contentWidth = this.content.width();
+				
+				//Show and hide functions - for showing the game or the page
+				this.ShowGame = function()
+				{
+					//Fade out and hide the page
+					this.content.animate({ opacity: 0 }, 200);
+					setTimeout(function(obj) { obj.content.css("visibility", "hidden"); }, 200, this);
+					
+					//Unsuspend the game
+					this.game.Unsuspend();
+				}
+				
+				this.HideGame = function()
+				{
+					//Show and fade in the page
+					this.content.css("visibility", "visible");
+					this.content.animate({ opacity: 1 }, 200);
+					
+					//No need to suspend here - this is a suspend callback
+				}
+			
+				//Create game
+				this.game = new Game();
+				
+				//Start game suspended
+				this.game.Suspend();
+				
+				//Register "suspend" event
+				this.game.RegisterEventListener("Suspended", function(game, obj) { obj.HideGame(); }, this);
+				
+				//Run game
+				this.game.Run();
+			};
+		</script>
+	</body>
+</html>
