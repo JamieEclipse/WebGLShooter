@@ -7,6 +7,9 @@ function Game()
 	
 	//Initialise renderer
 	this.renderer = new Renderer(this);
+
+	//Initialise physics
+	this.physics = new Physics(this);
 	
 	//Named callback arrays for communication inside and outside of the game
 	this.events = { };
@@ -17,14 +20,17 @@ function Game()
 	
 	//Initialise objects
 	//TODO: Do this in a derived class or load from data
-	var Wall1 = new Wall(this);
-	var Wall2 = new Wall(this);
-	var Wall3 = new Wall(this);
-	Wall1.position.set([-1, 0, 0]);
-	Wall3.position.set([1, 0, 0]);
+	var wall1 = new Wall(this);
+	var wall2 = new Wall(this);
+	var wall3 = new Wall(this);
+	var wall4 = new Wall(this);
+	wall1.position.set([-0.5, 0.5, 0]);
+	wall2.position.set([0.5, 0.5, 0]);
+	wall3.position.set([-0.5, -1.5, 0]);
+	wall4.position.set([0.5, -1.5, 0]);
 	var player = new Player(this);
-	player.position.set([0, 0, 2]);
-	this.objects = [player, Wall1, Wall2, Wall3 ];
+	player.position.set([0, 4, 2]);
+	this.objects = [player, wall1, wall2, wall3, wall4];
 };
 
 
@@ -62,6 +68,9 @@ Game.prototype.Run = function()
 //Perform one game logic update
 Game.prototype.Update = function(deltaTime, updateType)
 {
+	//Update physics
+	this.physics.Update(deltaTime);
+
 	//Update all game objects
 	for(i in this.objects)
 	{

@@ -19,10 +19,18 @@ function Player(game)
 	this.yaw = 0;
 	
 	//Offset from player position to camera position
-	this.cameraOffset = vec3.create();
+	this.cameraOffset = vec3.fromValues(0, 1.1, 0);
 	
 	//The angle of the sine wave to set the yaw to
 	this.suspendedYawChangeAngle = 0.0;
+
+	//Set up collisions
+	this.physics = new PhysicsObject(new Sphere(this.position, 0.5));
+	game.physics.AddPhysicsObject(this.physics);
+
+	//TODO: Move me to a different object
+	this.floor = new PhysicsObject(new Plane(vec3.fromValues(0, 1, 0), 0));
+	game.physics.AddPhysicsObject(this.floor);
 };
 
 Player.prototype = Object.create(GameObject.prototype);
@@ -102,10 +110,16 @@ Player.prototype.Update = function(deltaTime)
 	
 	var sinYaw = Math.sin(this.yaw);
 	var cosYaw = Math.cos(this.yaw);
-	this.velocity.set([cosYaw * right + sinYaw * forward, 0, cosYaw * -forward + sinYaw * right]);
+	this.physics.velocity.set([cosYaw * right + sinYaw * forward, this.physics.velocity[1], cosYaw * -forward + sinYaw * right]);
+
+	//Jump
+	if(this.buttons["Jump"] && Math.abs(this.physics.velocity[1]) < 0.01)
+	{
+		this.physics.velocity[1] = 5;
+	}
 	
-	//Move
-	vec3.scaleAndAdd(this.position, this.position, this.velocity, deltaTime);
+	//Gravity
+	this.physics.velocity[1] -= 9.8 * deltaTime;
 	
 	//Move the camera
 	vec3.add(this.game.renderer.camera.position, this.position, this.cameraOffset);
@@ -123,7 +137,7 @@ Player.prototype.Update = function(deltaTime)
 Player.prototype.UpdateSuspended = function(deltaTime)
 {
 	//Position camera
-	this.game.renderer.camera.position.set([0, 0, 2]);
+	this.game.renderer.camera.position.set([0, this.cameraOffset[1] + this.physics.shape.radius, 2]);
 	
 	//Slowly spin the camera
 	this.suspendedYawChangeAngle += deltaTime * 0.1;

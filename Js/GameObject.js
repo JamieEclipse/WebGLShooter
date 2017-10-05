@@ -8,7 +8,6 @@ function GameObject(game)
 	this.game = game;
 
 	this.position = vec3.create();
-	this.velocity = vec3.create();
 }
 
 
