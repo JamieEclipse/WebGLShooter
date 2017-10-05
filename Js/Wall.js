@@ -15,6 +15,10 @@ function Wall(game)
 	//Wall shader
 	this.shader = new Shader(game.renderer.gl);
 	this.shader.textures = [this.texture.texture];
+
+	//Physics
+	this.physics = new PhysicsObject(new BoundingBox(this.position, vec3.fromValues(0.5, 0.5, 0.5)));
+	game.physics.AddPhysicsObject(this.physics);
 };
 
 Wall.prototype = Object.create(GameObject.prototype);
