@@ -17,6 +17,7 @@ function Player(game)
 	
 	//Direction
 	this.yaw = 0;
+	this.pitch = 0;
 	
 	//Offset from player position to camera position
 	this.cameraOffset = vec3.fromValues(0, 1.1, 0);
@@ -31,6 +32,13 @@ function Player(game)
 	//TODO: Move me to a different object
 	this.floor = new PhysicsObject(new Plane(vec3.fromValues(0, 1, 0), 0));
 	game.physics.AddPhysicsObject(this.floor);
+
+	//Initial mouse position
+	this.mousePosition = undefined;
+	this.previousMousePosition = undefined;
+
+	//Register mouse move event
+	$("body").mousemove(this.OnMouseMove.bind(this));
 };
 
 Player.prototype = Object.create(GameObject.prototype);
@@ -62,7 +70,9 @@ Player.prototype.SetupInput = function()
 	var KeyS = [115, 83];
 	var KeyD = [100, 68];
 	var KeyLeft = [37];
+	var KeyUp = [38];
 	var KeyRight = [39];
+	var KeyDown = [40];
 	var KeySpace = [32];
 	var KeyEscape = [27];
 	
@@ -72,8 +82,10 @@ Player.prototype.SetupInput = function()
 	this.BindKeys(KeyS, "Backward");
 	this.BindKeys(KeyD, "Right");
 	this.BindKeys(KeySpace, "Jump");
-	this.BindKeys(KeyLeft, "TurnLeft");
-	this.BindKeys(KeyRight, "TurnRight");
+	this.BindKeys(KeyLeft, "LookLeft");
+	this.BindKeys(KeyRight, "LookRight");
+	this.BindKeys(KeyUp, "LookUp");
+	this.BindKeys(KeyDown, "LookDown");
 	this.BindKeys(KeyEscape, "Menu");
 }
 
@@ -89,15 +101,46 @@ Player.prototype.SetInputAction = function(down)
 }
 
 
+//TODO: Consider registering and deregistering this event based on mouse up/down. (And maybe hide the cursor)
+Player.prototype.OnMouseMove = function(event)
+{
+	if(this.mousePosition == undefined)
+	{
+		//Store initial value
+		this.mousePosition = vec2.fromValues(event.clientX, event.clientY);
+		this.previousMousePosition = vec2.clone(this.mousePosition);
+	}
+	else
+	{
+		//Store subsequent values
+		this.previousMousePosition = vec2.clone(this.mousePosition);
+		this.mousePosition = vec2.fromValues(event.clientX, event.clientY);
+	}
+
+	//Mouse must be held
+	if(event.which == 1)
+	{
+		//TODO: Extract this a preferences window?
+		var mouseSensitivity = 0.002;
+		this.yaw += mouseSensitivity * (this.mousePosition[0] - this.previousMousePosition[0]);
+		this.pitch -= mouseSensitivity * (this.mousePosition[1] - this.previousMousePosition[1]);
+	}
+
+}
+
+
 //Main update - move, jump, shoot etc
 Player.prototype.Update = function(deltaTime)
 {
-	//Look controls
-	//TODO: Mouse look
+	//Keyboard look controls
 	var yawChange =
-		(this.buttons["TurnRight"] ? 1 : 0)
-		- (this.buttons["TurnLeft"] ? 1 : 0);
+		(this.buttons["LookRight"] ? 1 : 0)
+		- (this.buttons["LookLeft"] ? 1 : 0);
 	this.yaw += 2 * deltaTime * yawChange;
+	var pitchChange =
+		(this.buttons["LookUp"] ? 1 : 0)
+		- (this.buttons["LookDown"] ? 1 : 0);
+	this.pitch += 2 * deltaTime * pitchChange;
 	
 	//Movement controls
 	var speed = 3;
@@ -108,21 +151,24 @@ Player.prototype.Update = function(deltaTime)
 		(this.buttons["Right"] ? speed : 0)
 		- (this.buttons["Left"] ? speed : 0);
 	
-	var sinYaw = Math.sin(this.yaw);
-	var cosYaw = Math.cos(this.yaw);
-	this.physics.velocity.set([cosYaw * right + sinYaw * forward, this.physics.velocity[1], cosYaw * -forward + sinYaw * right]);
-
+	//Build final velocity
+	var ySpeed = this.physics.velocity[1];
+	this.physics.velocity.set([right, 0, -forward]);
+	vec3.rotateY(this.physics.velocity, this.physics.velocity, vec3.create(), -this.yaw);
+	this.physics.velocity[1] = ySpeed;
+	
 	//Jump
 	if(this.buttons["Jump"] && Math.abs(this.physics.velocity[1]) < 0.01)
 	{
 		this.physics.velocity[1] = 5;
 	}
-	
+
 	//Gravity
 	this.physics.velocity[1] -= 9.8 * deltaTime;
-	
+
 	//Move the camera
 	vec3.add(this.game.renderer.camera.position, this.position, this.cameraOffset);
+	this.game.renderer.camera.pitch = this.pitch;
 	this.game.renderer.camera.yaw = this.yaw;
 	
 	//Suspend the game

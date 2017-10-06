@@ -8,7 +8,7 @@ function Renderer(game)
 	this.game = game;
 
 	//Get the canvas to render to
-	this.canvas = document.querySelector("#glCanvas");
+	this.canvas = game.window[0];
 	
 	//Resize the canvas
 	this.canvas.width = this.canvas.clientWidth;

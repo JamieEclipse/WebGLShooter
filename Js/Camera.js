@@ -6,8 +6,9 @@ function Camera()
 {
 	this.position = vec3.create();
 	
-	//TODO: Add pitch and roll, or use a vec3 or quaternion.
+	//TODO: Add roll, or swap to a vec3 or quaternion.
 	this.yaw = 0;
+	this.pitch = 0;
 }
 
 
@@ -21,7 +22,7 @@ Camera.prototype.GetProjectionMatrix = function(width, height)
 	// ratio that matches the display size of the canvas
 	// and we only want to see objects between 0.1 units
 	// and 100 units away from the camera.
-	const fieldOfView = 45 * Math.PI / 180; // in radians
+	const fieldOfView = 60 * Math.PI / 180; // in radians
 	const aspect = width / height;
 	const zNear = 0.001;
 	const zFar = 100.0;
@@ -43,6 +44,10 @@ Camera.prototype.GetViewMatrix = function()
 	var viewMatrix = mat4.create();
 	
 	//Rotate to account for the camera's orientation
+	mat4.rotate(viewMatrix,
+		viewMatrix,
+		this.pitch,
+		[-1, 0, 0]);
 	mat4.rotate(viewMatrix,
 		viewMatrix,
 		this.yaw,

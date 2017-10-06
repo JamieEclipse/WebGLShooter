@@ -5,6 +5,9 @@ function Game()
 	this.suspended = false;
 	//TODO: Pause - another bool or switch to an "enum"?
 	
+	//Get window
+	this.window = $("#glCanvas");
+	
 	//Initialise renderer
 	this.renderer = new Renderer(this);
 
