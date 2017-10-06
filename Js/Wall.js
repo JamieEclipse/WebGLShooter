@@ -7,7 +7,9 @@ function Wall(game)
 	GameObject.call(this, game);
 	
 	//Wall model
-	this.model = new Model(game.renderer.gl);
+	//TODO: Reference a centralised asset
+	var scale = 3;
+	this.model = new Model(game.renderer.gl, "Models/Cube.json", scale);
 	
 	//Wall texture
 	this.texture = new Texture(game.renderer.gl, "Images/Wall.png");
@@ -17,7 +19,7 @@ function Wall(game)
 	this.shader.textures = [this.texture.texture];
 
 	//Physics
-	this.physics = new PhysicsObject(new BoundingBox(this.position, vec3.fromValues(0.5, 0.5, 0.5)));
+	this.physics = new PhysicsObject(new BoundingBox(this.position, vec3.fromValues(0.5 * scale, 0.5 * scale, 0.5 * scale)));
 	game.physics.AddPhysicsObject(this.physics);
 };
 

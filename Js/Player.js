@@ -183,7 +183,7 @@ Player.prototype.Update = function(deltaTime)
 Player.prototype.UpdateSuspended = function(deltaTime)
 {
 	//Position camera
-	this.game.renderer.camera.position.set([0, this.cameraOffset[1] + this.physics.shape.radius, 2]);
+	this.game.renderer.camera.position.set([0, this.cameraOffset[1] + this.physics.shape.radius, 6]);
 	
 	//Slowly spin the camera
 	this.suspendedYawChangeAngle += deltaTime * 0.1;

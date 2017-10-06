@@ -45,27 +45,32 @@ Renderer.prototype.Draw = function()
 //Draws a model using the specified shader and model matrix
 Renderer.prototype.DrawModel = function(model, shader, modelMatrix)
 {
+	//Check resources are loaded
+	//TODO: Check shader and textures?
+	if(!model.loaded)
+	{
+		return;
+	}
+
 	//Prepare matrices
 	const projectionMatrix = this.camera.GetProjectionMatrix(this.gl.canvas.clientWidth, this.gl.canvas.clientHeight);
 	const viewMatrix = this.camera.GetViewMatrix();
 
 	//Bind the model
 	model.BindForDrawing(this.gl, shader);
+
+	//Bind the shader
+	this.gl.useProgram(shader.program);
 	
-	//Bind the texture to the appropriate slot
+	//Bind the textures
 	shader.BindTextures(this.gl);
 
-	// Tell WebGL to use our program when drawing
-	this.gl.useProgram(shader.program);
-
-	// Set the shader uniforms
+	//Set the shader uniforms
 	this.gl.uniformMatrix4fv(shader.uniformLocations.projectionMatrix, false, projectionMatrix);
 	this.gl.uniformMatrix4fv(shader.uniformLocations.viewMatrix, false, viewMatrix);
 	this.gl.uniformMatrix4fv(shader.uniformLocations.modelMatrix, false, modelMatrix);
 
-	{
-		const offset = 0;
-		const vertexCount = 4;
-		this.gl.drawArrays(this.gl.TRIANGLE_STRIP, offset, vertexCount);
-	}
+	//Draw call
+	const offset = 0;
+	this.gl.drawElements(this.gl.TRIANGLES, model.indices.length, this.gl.UNSIGNED_SHORT, offset);
 }

@@ -2,29 +2,75 @@
 "use strict"
 
 
-function Model(gl)
+function Model(gl, data, scale)
 {
+	//Store reference to GL context
+	this.gl = gl;
+
 	//Create buffers
 	this.positionBuffer = gl.createBuffer();
 	this.texCoordBuffer = gl.createBuffer();
+	this.indexBuffer = gl.createBuffer();
 	
-	//Set initial values to a textured quad
-	this.positions = [
-		 0.5, 0.5, 0.0,
-		-0.5, 0.5, 0.0,
-		 0.5, -0.5, 0.0,
-		-0.5, -0.5, 0.0,
-	];
+	//Loaded flag
+	this.loaded = false;
+
+	//Default scale value
+	if(scale === undefined)
+	{
+		scale = 1;
+	}
+	this.scale = scale;
 	
-	this.texCoords = [
-		0, 0,
-		1, 0,
-		0, 1,
-		1, 1
-	];
-	
-	//Write initial values to buffers
-	this.WriteToBuffers(gl);
+	if(data === undefined)
+	{
+		var size = 0.5 * this.scale;
+
+		//Set default values to a textured quad
+		this.positions = [
+			size, size, 0.0,
+			-size, size, 0.0,
+			size, -size, 0.0,
+			-size, -size, 0.0,
+		];
+		
+		this.texCoords = [
+			0, 0,
+			1, 0,
+			0, 1,
+			1, 1
+		];
+
+		this.indices = [ 0, 1, 2, 2, 1, 3 ];
+
+		//Write initial values to buffers
+		this.loaded = true;
+		this.WriteToBuffers(gl);
+	}
+	else
+	{
+		$.getJSON(data, {}, function(json)
+		{
+			//Copy data
+			for(var name in json)
+			{
+				this[name] = json[name];
+			}
+
+			//Apply scale
+			if(this.scale != 1)
+			{
+				for(var i in json.positions)
+				{
+					json.positions[i] *= this.scale;
+				}
+			}
+
+			//Write initial values to buffers
+			this.loaded = true;
+			this.WriteToBuffers(this.gl);
+		}.bind(this));
+	}
 }
 
 
@@ -38,16 +84,21 @@ Model.prototype.WriteToBuffers = function(gl)
 	//Build the texCoord buffer
 	gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.texCoords), gl.STATIC_DRAW);
-	
-	//Unbind
+
+	//Build this index buffer
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
+
+	//Unbind buffers
 	gl.bindBuffer(gl.ARRAY_BUFFER, null);
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 }
 
 
 //Ready the model for drawing by binding to the appropriate shader inputs
 Model.prototype.BindForDrawing = function(gl, shader)
 {
-	//Bind the vertex buffer
+	//Bind the position buffer
 	{
 		const numComponents = 3;// pull out 2 values per iteration
 		const type = gl.FLOAT;// the data in the buffer is 32bit floats
@@ -66,6 +117,7 @@ Model.prototype.BindForDrawing = function(gl, shader)
 		gl.enableVertexAttribArray(shader.attributeLocations.vertexPosition);
 	}
 	
+	//Bind the texture co-ordinate buffer
 	{
 		const numComponents = 2;// pull out 2 values per iteration
 		const type = gl.FLOAT;// the data in the buffer is 32bit floats
@@ -83,4 +135,7 @@ Model.prototype.BindForDrawing = function(gl, shader)
 			offset);
 		gl.enableVertexAttribArray(shader.attributeLocations.texCoordPosition);
 	}
+
+	//Bind the index buffer
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 }

@@ -4,7 +4,7 @@ function Game()
 	//Run state
 	this.suspended = false;
 	//TODO: Pause - another bool or switch to an "enum"?
-	
+
 	//Get window
 	this.window = $("#glCanvas");
 	
@@ -27,12 +27,12 @@ function Game()
 	var wall2 = new Wall(this);
 	var wall3 = new Wall(this);
 	var wall4 = new Wall(this);
-	wall1.position.set([-0.5, 0.5, 0]);
-	wall2.position.set([0.5, 0.5, 0]);
-	wall3.position.set([-0.5, -1.5, 0]);
-	wall4.position.set([0.5, -1.5, 0]);
+	wall1.position.set([-4.5, 0, 0]);
+	wall2.position.set([-1.5, 1.5, 0]);
+	wall3.position.set([1.5, 1.5, 0]);
+	wall4.position.set([4.5, 0, 0]);
 	var player = new Player(this);
-	player.position.set([0, 4, 2]);
+	player.position.set([0, player.physics.shape.radius + player.cameraOffset[1], 6]);
 	this.objects = [player, wall1, wall2, wall3, wall4];
 };
 
