@@ -2,7 +2,7 @@
 "use strict"
 
 
-function Model(gl, data, scale)
+function Model(gl, data, scale = 1)
 {
 	//Store reference to GL context
 	this.gl = gl;
@@ -15,11 +15,7 @@ function Model(gl, data, scale)
 	//Loaded flag
 	this.loaded = false;
 
-	//Default scale value
-	if(scale === undefined)
-	{
-		scale = 1;
-	}
+	//Store scale
 	this.scale = scale;
 	
 	if(data === undefined)

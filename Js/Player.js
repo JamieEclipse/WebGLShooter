@@ -2,9 +2,9 @@
 "use strict"
 
 
-function Player(game)
+function Player(game, properties)
 {
-	GameObject.call(this, game);
+	GameObject.call(this, game, properties);
 	
 	//Contains a "button down" bool for each input action
 	this.buttons = { };
@@ -14,10 +14,14 @@ function Player(game)
 	
 	//Ready for input
 	this.SetupInput();
+
+	//Position
+	this.LoadVectorProperty("position");
+	this.startingPosition = vec3.clone(this.position);
 	
 	//Direction
-	this.yaw = 0;
-	this.pitch = 0;
+	this.LoadProperty("yaw", 0);
+	this.LoadProperty("pitch", 0);
 	
 	//Offset from player position to camera position
 	this.cameraOffset = vec3.fromValues(0, 1.1, 0);
@@ -183,7 +187,7 @@ Player.prototype.Update = function(deltaTime)
 Player.prototype.UpdateSuspended = function(deltaTime)
 {
 	//Position camera
-	this.game.renderer.camera.position.set([0, this.cameraOffset[1] + this.physics.shape.radius, 6]);
+	vec3.add(this.game.renderer.camera.position, this.cameraOffset, this.startingPosition);
 	
 	//Slowly spin the camera
 	this.suspendedYawChangeAngle += deltaTime * 0.1;

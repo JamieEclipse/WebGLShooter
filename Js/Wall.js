@@ -1,26 +1,60 @@
 //Obstacle with model
+//TODO: Generalise this further then rename it
 "use strict"
 
 
-function Wall(game)
+function Wall(game, properties)
 {
-	GameObject.call(this, game);
+	GameObject.call(this, game, properties);
+
+	//Position
+	this.LoadVectorProperty("position");
 	
 	//Wall model
 	//TODO: Reference a centralised asset
-	var scale = 3;
-	this.model = new Model(game.renderer.gl, "Models/Cube.json", scale);
+	this.LoadProperty("scale", 4);
+	var modelFile = this.GetProperty("model", "Models/Cube.json");
+	this.model = new Model(game.renderer.gl, modelFile, this.scale);
 	
 	//Wall texture
-	this.texture = new Texture(game.renderer.gl, "Images/Wall.png");
+	var textureFile = this.GetProperty("texture", "Images/Wall.png");
+	this.texture = new Texture(game.renderer.gl, textureFile);
 	
 	//Wall shader
 	this.shader = new Shader(game.renderer.gl);
 	this.shader.textures = [this.texture.texture];
 
 	//Physics
-	this.physics = new PhysicsObject(new BoundingBox(this.position, vec3.fromValues(0.5 * scale, 0.5 * scale, 0.5 * scale)));
-	game.physics.AddPhysicsObject(this.physics);
+	if("physics" in this.properties)
+	{
+		//Loop through physics data
+		for(var i = 0; i < this.properties.physics.length; ++i)
+		{
+			var physicsData = this.properties.physics[i];
+			var shape;
+
+			//Load a shape
+			//TODO: Other shapes. Architect this properly.
+			switch(physicsData.type)
+			{
+				case "Plane":
+				shape = new Plane(physicsData.normal, physicsData.offset);
+				break;
+			}
+
+			//Add a physics object
+			if(shape !== undefined)
+			{
+				var physics = new PhysicsObject(shape);
+				game.physics.AddPhysicsObject(physics);
+			}
+		}
+	}
+	else
+	{
+		var physics = new PhysicsObject(new BoundingBox(this.position, vec3.fromValues(0.5 * this.scale, 0.5 * this.scale, 0.5 * this.scale)));
+		game.physics.AddPhysicsObject(physics);
+	}
 };
 
 Wall.prototype = Object.create(GameObject.prototype);

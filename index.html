@@ -111,9 +111,14 @@
 				
 				//Register "suspend" event
 				this.game.RegisterEventListener("Suspended", function(game, obj) { obj.HideGame(); }, this);
-				
-				//Run game
-				this.game.Run();
+
+				//Load level
+				this.game.LoadLevel("Levels/Level.json", function()
+				{
+					//Run game
+					this.game.Run();
+					
+				}.bind(this));
 			};
 		</script>
 	</body>

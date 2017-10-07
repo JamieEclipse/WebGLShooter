@@ -1,0 +1,39 @@
+[
+	{ "type": "Player", "position": [0, 1.5, 6] },
+
+	{ "type": "Wall", "position": [-10, 2, -14] },
+	{ "type": "Wall", "position": [-6, 2, -14] },
+	{ "type": "Wall", "position": [-2, 2, -14] },
+	{ "type": "Wall", "position": [2, 2, -14] },
+	{ "type": "Wall", "position": [6, 2, -14] },
+	{ "type": "Wall", "position": [10, 2, -14] },
+
+	{ "type": "Wall", "position": [-10, 2, 14] },
+	{ "type": "Wall", "position": [-6, 2, 14] },
+	{ "type": "Wall", "position": [-2, 2, 14] },
+	{ "type": "Wall", "position": [2, 2, 14] },
+	{ "type": "Wall", "position": [6, 2, 14] },
+	{ "type": "Wall", "position": [10, 2, 14] },
+
+	{ "type": "Wall", "position": [-14, 2, -10] },
+	{ "type": "Wall", "position": [-14, 2, -6] },
+	{ "type": "Wall", "position": [-14, 2, -2] },
+	{ "type": "Wall", "position": [-14, 2, 2] },
+	{ "type": "Wall", "position": [-14, 2, 6] },
+	{ "type": "Wall", "position": [-14, 2, 10] },
+
+	{ "type": "Wall", "position": [14, 2, -10] },
+	{ "type": "Wall", "position": [14, 2, -6] },
+	{ "type": "Wall", "position": [14, 2, -2] },
+	{ "type": "Wall", "position": [14, 2, 2] },
+	{ "type": "Wall", "position": [14, 2, 6] },
+	{ "type": "Wall", "position": [14, 2, 10] },
+
+	{ "type": "Wall", "position": [-4, -1, -4] },
+	{ "type": "Wall", "position": [4, -1, -4] },
+	{ "type": "Wall", "position": [-4, -1, 4] },
+	{ "type": "Wall", "position": [4, -1, 4] },
+
+	{ "type": "Wall", "position": [0, 0, 0], "scale": 24, "model": "Models/Floor.json", "texture": "Images/FloorLarge.png", "physics": [ { "type": "Plane", "normal": [0, 1, 0], "offset": 0 } ] },
+	{ "type": "Wall", "position": [0, 4, 0], "scale": 24, "model": "Models/Floor.json", "texture": "Images/FloorLarge.png", "physics": [ { "type": "Plane", "normal": [0, -1, 0], "offset": -4 } ] }
+]

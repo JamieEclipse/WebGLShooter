@@ -22,18 +22,7 @@ function Game()
 	this.RegisterEventListener("Unsuspended", function(game, args) { game.suspended = false; });
 	
 	//Initialise objects
-	//TODO: Do this in a derived class or load from data
-	var wall1 = new Wall(this);
-	var wall2 = new Wall(this);
-	var wall3 = new Wall(this);
-	var wall4 = new Wall(this);
-	wall1.position.set([-4.5, 0, 0]);
-	wall2.position.set([-1.5, 1.5, 0]);
-	wall3.position.set([1.5, 1.5, 0]);
-	wall4.position.set([4.5, 0, 0]);
-	var player = new Player(this);
-	player.position.set([0, player.physics.shape.radius + player.cameraOffset[1], 6]);
-	this.objects = [player, wall1, wall2, wall3, wall4];
+	this.objects = [ ];
 };
 
 
@@ -82,6 +71,24 @@ Game.prototype.Update = function(deltaTime, updateType)
 	
 	//Render
 	this.renderer.Draw();
+}
+
+
+//Load a level from json
+Game.prototype.LoadLevel = function(file, callback)
+{
+	$.getJSON(file, {}, function(json)
+	{
+		//Load objects
+		for(var i = 0; i < json.length; ++i)
+		{
+			var objectData = json[i];
+			this.objects.push(new window[objectData.type](this, objectData));
+		}
+
+		//Run callback
+		callback();
+	}.bind(this));
 }
 
 
