@@ -40,10 +40,14 @@ function Shader(gl)
 		
 		void main()
 		{
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-			
-			vec3 scaledCoord = worldPosition * 10.0;
+			//Sample texure
 			gl_FragColor = texture2D(uTexture, textureCoordinate);
+
+			//Apply fog
+			float fogAmount = (1.0 - gl_FragCoord.w);
+			fogAmount = clamp(fogAmount, 0.0, 1.0);
+			vec3 fogColour = vec3(0.01, 0.0, 0.0);
+			gl_FragColor.xyz = mix(gl_FragColor.xyz, fogColour, fogAmount);
 		}
 		`;
 		
