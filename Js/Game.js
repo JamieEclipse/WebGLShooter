@@ -1,28 +1,39 @@
 //Constructor
 function Game()
 {
-	//Run state
-	this.suspended = false;
-	//TODO: Pause - another bool or switch to an "enum"?
-
-	//Get window
-	this.window = $("#glCanvas");
+	try
+	{
+		//Run state
+		this.suspended = false;
+		//TODO: Pause - another bool or switch to an "enum"?
+		
+		//Get window
+		this.window = $("#glCanvas");
+		
+		//Initialise renderer
+		this.renderer = new Renderer(this);
+		
+		//Initialise physics
+		this.physics = new Physics(this);
 	
-	//Initialise renderer
-	this.renderer = new Renderer(this);
-
-	//Initialise physics
-	this.physics = new Physics(this);
-	
-	//Named callback arrays for communication inside and outside of the game
-	this.events = { };
-	
-	//Set up suspended and unsuspended events
-	this.RegisterEventListener("Suspended", function(game, args) { game.suspended = true; });
-	this.RegisterEventListener("Unsuspended", function(game, args) { game.suspended = false; });
-	
-	//Initialise objects
-	this.objects = [ ];
+		//Initialise input
+		this.input = new Input(this);
+		
+		//Named callback arrays for communication inside and outside of the game
+		this.events = { };
+		
+		//Set up suspended and unsuspended events
+		this.RegisterEventListener("Suspended", function(game, args) { game.suspended = true; });
+		this.RegisterEventListener("Unsuspended", function(game, args) { game.suspended = false; });
+		
+		//Initialise objects
+		this.objects = [ ];
+	}
+	catch(exception)
+	{
+		console.log(exception + exception.stack);
+		alert(exception + exception.stack);
+	}
 };
 
 
@@ -48,7 +59,8 @@ Game.prototype.Run = function()
 		}
 		catch(exception)
 		{
-			console.error(exception);
+			console.error(exception + exception.stack);
+			alert(exception + exception.stack);
 		}
 	};
 	
@@ -62,6 +74,9 @@ Game.prototype.Update = function(deltaTime, updateType)
 {
 	//Update physics
 	this.physics.Update(deltaTime);
+	
+	//Update input
+	this.input.Update(deltaTime);
 
 	//Update all game objects
 	for(i in this.objects)

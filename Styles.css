@@ -6,7 +6,54 @@
 	z-index: -1;
 }
 
+.uiButton
+{
+	color: #FFFFFFDD;
+	background: none;
+	background-color: #00000066;
+	border: 1px rgba(255, 255, 255, 0.5) solid;
+	z-index: 2;
+	display: none;
+	
+	position: fixed;
+	width: 50px;
+	height: 50px;
+	border-radius: 8px;
+}
+
+#jumpButton
+{
+	border-top-left-radius: 24px;
+	left: 4px;
+	bottom: 58px;
+}
+
+#forwardButton
+{
+	left: 58px;
+	bottom: 58px;
+}
+
+#leftButton
+{
+	left: 4px;
+	bottom: 4px;
+}
+
+#backwardButton
+{
+	left: 58px;
+	bottom: 4px;
+}
+
+#rightButton
+{
+	left: 112px;
+	bottom: 4px;
+}
+
 .main
 {
 	background-color: white;
 }
+    

@@ -22,10 +22,17 @@
 		<!-- Game canvas - behind the page -->
 		<canvas id="glCanvas"></canvas>
 		
+		<!-- Mobile controls -->
+		<button id="jumpButton" class="uiButton"></button>
+		<button id="forwardButton" class="uiButton"></button>
+		<button id="backwardButton" class="uiButton"></button>
+		<button id="leftButton" class="uiButton"></button>
+		<button id="rightButton" class="uiButton"></button>
+		
 		<div class="container main" id="content" style="background: rgba(255, 255, 255, 1.0);">
 			<div>
 				<h1 class="display-1 text-center">Portfolio</h1>
-				<p class="lead">Content here</p>
+				<p class="lead">Content here test</p>
 				
 				<!-- Button to hide page (to show the game) -->
 				<h5 class="display-5">WebGL Game</h5>
@@ -33,7 +40,7 @@
 				<!-- Temporary text -->
 				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mollis elit metus, sit amet efficitur erat semper et. Maecenas sed enim sem. Fusce et nisi augue. Aliquam bibendum eleifend bibendum. Sed molestie orci et sapien faucibus scelerisque. Aenean eu orci vitae ante consequat hendrerit id sed libero. Morbi id ligula faucibus, convallis purus ac, mattis massa. Curabitur vitae cursus sem. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
 				<p>
-					<button type="button" onclick="Launcher.ShowGame();">Show game.</button>
+					<button type="button" onclick="launcher.ShowGame();">Show game.</button>
 				</p>
 				<p>Donec vitae sollicitudin urna. Sed malesuada tellus ac ante egestas, eget dignissim urna maximus. Donec id suscipit diam. Vestibulum non urna imperdiet ex tempus volutpat eu et nibh. Nunc vel lacus lectus. Integer ut diam arcu. Pellentesque ullamcorper nunc et leo dapibus, vel vehicula odio ultricies. Maecenas accumsan nisi sit amet odio scelerisque ullamcorper. Sed tempus ac libero vel sodales. Duis sit amet vehicula dolor. Etiam non risus mi. Integer porttitor nisl dolor, a mollis lacus scelerisque eu.</p>
 				<p>Aliquam mollis tristique lacus, sit amet porttitor orci porta vel. Cras id venenatis dolor, sit amet sagittis purus. Nunc suscipit orci at ornare ornare. Duis id fringilla nisi. Fusce porta, lacus efficitur ullamcorper convallis, ex magna varius quam, et rhoncus massa nisi non justo. Cras tempor nibh in pharetra efficitur. Sed a scelerisque sapien. Fusce feugiat at libero nec pulvinar. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Vestibulum vel iaculis libero. Sed blandit ac arcu ut blandit. Aenean rutrum lorem quam, vehicula mattis nunc ullamcorper ut.</p>
@@ -44,7 +51,6 @@
 				<p>Pellentesque dapibus libero pulvinar, dapibus nisi cursus, hendrerit tortor. Aliquam vehicula sed justo ut rutrum. Mauris eu pretium quam. Donec lobortis feugiat erat a imperdiet. Ut sed dolor quis diam rhoncus feugiat at in ante. Aliquam accumsan, ante non placerat porta, diam tellus semper erat, non pretium lorem diam a diam. Etiam porta rutrum ultrices. Ut nec libero quis dui interdum accumsan. Quisque a ullamcorper massa. Vivamus et orci eu sem eleifend condimentum vel sit amet tortor. Quisque est diam, imperdiet in purus nec, efficitur posuere dolor. Nunc ultricies nisi non mattis convallis. Praesent consectetur id leo sed varius. Mauris pulvinar est dignissim odio efficitur, vel lobortis orci accumsan. Integer tempor ultrices massa, id vulputate nunc. Ut elementum sem ex, ac mattis lacus volutpat eget.</p>
 				<p>Etiam rutrum enim vel orci tempor viverra. Sed gravida at dolor vel condimentum. Etiam in mauris id nulla pellentesque sollicitudin. Duis tempus orci et augue dapibus, quis consectetur tellus vestibulum. Duis ut accumsan nunc. Phasellus rhoncus a purus vitae convallis. Nam a justo convallis, sollicitudin tortor dignissim, sodales tellus. Morbi rhoncus tellus quis pulvinar suscipit. Mauris ut arcu non massa tristique interdum. Curabitur a purus quis arcu imperdiet consequat. Vestibulum et posuere eros, nec sagittis enim. Cras sapien eros, malesuada at eleifend ut, placerat eu lectus. Suspendisse vitae velit hendrerit, sollicitudin lectus sit amet, congue lacus.</p>
 				<p>Cras interdum vel nisl in commodo. Integer ac sollicitudin libero, dignissim posuere nibh. Sed consequat, mi sed vehicula lobortis, neque nisi suscipit massa, eu interdum massa tellus id mauris. Suspendisse elementum consequat libero vitae accumsan. Mauris tellus lacus, venenatis vel neque et, venenatis malesuada urna. Mauris ut mi augue. In vulputate lorem tortor, in congue velit hendrerit nec. Vestibulum vitae sapien sodales, porttitor turpis eget, sagittis eros. Morbi vitae pretium dui. Sed auctor suscipit arcu eu pretium. Ut dapibus tempus lectus, in pharetra nibh blandit sed. Quisque non iaculis odio. Nam viverra magna vitae quam fringilla consequat. Fusce consequat, sapien sit amet egestas rutrum, diam risus vehicula libero, non porttitor urna tortor ac lorem.</p>
-				
 			</div>
 			
 			<div>Footer</div>
@@ -61,6 +67,7 @@
 		<script src="Js/Camera.js"></script>
 		<script src="Js/Game.js"></script>
 		<script src="Js/GameObject.js"></script>
+		<script src="Js/Input.js"></script>
 		<script src="Js/Model.js"></script>
 		<script src="Js/Physics/BoundingBox.js"></script>
 		<script src="Js/Physics/Physics.js"></script>
@@ -77,7 +84,7 @@
 		
 		<!-- Run the game -->
 		<script>
-			var Launcher = new function()
+			var launcher = new function()
 			{
 				//Get content window
 				this.content = $('#content');
@@ -88,7 +95,12 @@
 				{
 					//Fade out and hide the page
 					this.content.animate({ opacity: 0 }, 200);
-					setTimeout(function(obj) { obj.content.css("visibility", "hidden"); }, 200, this);
+					setTimeout(function(obj)
+					{
+						obj.content.css("visibility", "hidden");
+						obj.game.window.css("z-index", 1);
+						
+					}, 200, this);
 					
 					//Unsuspend the game
 					this.game.Unsuspend();
@@ -123,3 +135,6 @@
 		</script>
 	</body>
 </html>
+    
+    
+    

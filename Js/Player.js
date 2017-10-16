@@ -6,12 +6,6 @@ function Player(game, properties)
 {
 	GameObject.call(this, game, properties);
 	
-	//Contains a "button down" bool for each input action
-	this.buttons = { };
-	
-	//Links one or more keys to an input action
-	this.keyBindings = { };
-	
 	//Ready for input
 	this.SetupInput();
 
@@ -42,32 +36,20 @@ function Player(game, properties)
 	this.previousMousePosition = undefined;
 
 	//Register mouse move event
-	$("body").mousemove(this.OnMouseMove.bind(this));
+	//TODO: Move to input
+	//$("body").mousemove(this.OnMouseMove.bind(this));
+	/*game.window.bind("touchmove", this.OnTouchMove.bind(this));
+	$("body").bind("touchbegin", this.OnTouchBegin.bind(this));
+	$("body").bind("touchend", this.OnTouchEnd.bind(this));*/
 };
 
 Player.prototype = Object.create(GameObject.prototype);
 Player.prototype.constructor = Player;
 
 
-//Bind an array of key codes to one "action" string
-Player.prototype.BindKeys = function(keyCodes, action)
-{
-	for(var i = 0; i < keyCodes.length; ++i)
-	{
-		this.keyBindings[keyCodes[i]] = action;
-	}
-}
-
-
 //Bind events and set up input actions
 Player.prototype.SetupInput = function()
 {
-	//Get element to receive input from
-	var doc = document.querySelector("body");
-	var obj = this;
-	doc.addEventListener("keydown", function() { obj.SetInputAction(true); });
-	doc.addEventListener("keyup", function() { obj.SetInputAction(false); });
-	
 	//Define inputs
 	var KeyW = [119, 87];
 	var KeyA = [97, 65];
@@ -81,27 +63,23 @@ Player.prototype.SetupInput = function()
 	var KeyEscape = [27];
 	
 	//Bind keys
-	this.BindKeys(KeyW, "Forward");
-	this.BindKeys(KeyA, "Left");
-	this.BindKeys(KeyS, "Backward");
-	this.BindKeys(KeyD, "Right");
-	this.BindKeys(KeySpace, "Jump");
-	this.BindKeys(KeyLeft, "LookLeft");
-	this.BindKeys(KeyRight, "LookRight");
-	this.BindKeys(KeyUp, "LookUp");
-	this.BindKeys(KeyDown, "LookDown");
-	this.BindKeys(KeyEscape, "Menu");
-}
-
-
-//Set the current state of an input action
-Player.prototype.SetInputAction = function(down)
-{
-	var inputAction = this.keyBindings[event.keyCode];
-	if(inputAction != undefined)
-	{
-		this.buttons[inputAction] = down;
-	}
+	this.game.input.BindKeys(KeyW, "Forward");
+	this.game.input.BindKeys(KeyA, "Left");
+	this.game.input.BindKeys(KeyS, "Backward");
+	this.game.input.BindKeys(KeyD, "Right");
+	this.game.input.BindKeys(KeySpace, "Jump");
+	this.game.input.BindKeys(KeyLeft, "LookLeft");
+	this.game.input.BindKeys(KeyRight, "LookRight");
+	this.game.input.BindKeys(KeyUp, "LookUp");
+	this.game.input.BindKeys(KeyDown, "LookDown");
+	this.game.input.BindKeys(KeyEscape, "Menu");
+	
+	//Register buttons
+	this.game.input.BindElement($("#jumpButton"), "Jump");
+	this.game.input.BindElement($("#forwardButton"), "Forward");
+	this.game.input.BindElement($("#backwardButton"), "Backward");
+	this.game.input.BindElement($("#leftButton"), "Left");
+	this.game.input.BindElement($("#rightButton"), "Right");
 }
 
 
@@ -124,12 +102,64 @@ Player.prototype.OnMouseMove = function(event)
 	//Mouse must be held
 	if(event.which == 1)
 	{
-		//TODO: Extract this a preferences window?
+		//TODO: Extract this to a preferences window?
 		var mouseSensitivity = 0.002;
 		this.yaw += mouseSensitivity * (this.mousePosition[0] - this.previousMousePosition[0]);
 		this.pitch -= mouseSensitivity * (this.mousePosition[1] - this.previousMousePosition[1]);
 	}
+	
+	if(!this.game.suspended)
+	{
+		event.preventDefault();
+	}
+}
 
+
+Player.prototype.OnTouchBegin = function(event)
+{
+	this.touchPosition = undefined;
+	
+	if(!this.game.suspended)
+	{
+		event.preventDefault();
+	}
+}
+
+
+
+Player.prototype.OnTouchEnd = function(event)
+{
+	this.touchPosition = undefined;
+	
+	if(!this.game.suspended)
+	{
+		event.preventDefault();
+	}
+}
+
+Player.prototype.OnTouchMove = function(event)
+{
+	//alert(JSON.stringify(event.touches[0]));
+	var touch = event.touches.item(0);
+	if(this.touchPosition == undefined)
+	{
+		//Store initial value
+		this.touchPosition = vec2.fromValues(touch.clientX, touch.clientY);
+		this.previousTouchPosition = vec2.clone(this.touchPosition);
+	}
+	else
+	{
+		//Store subsequent values
+		this.previousTouchPosition = vec2.clone(this.touchPosition);
+		this.touchPosition = vec2.fromValues(touch.clientX, touch.clientY);
+	}
+
+	//TODO: Extract this to a preferences window?
+	var touchSensitivity = 0.02;
+	this.yaw += touchSensitivity * (this.touchPosition[0] - this.previousTouchPosition[0]);
+	this.pitch -= touchSensitivity * (this.touchPosition[1] - this.previousTouchPosition[1]);
+	
+	event.preventDefault();
 }
 
 
@@ -138,22 +168,26 @@ Player.prototype.Update = function(deltaTime)
 {
 	//Keyboard look controls
 	var yawChange =
-		(this.buttons["LookRight"] ? 1 : 0)
-		- (this.buttons["LookLeft"] ? 1 : 0);
+		(this.game.input.GetActionValue("LookRight") ? 1 : 0)
+		- (this.game.input.GetActionValue("LookLeft") ? 1 : 0);
 	this.yaw += 2 * deltaTime * yawChange;
 	var pitchChange =
-		(this.buttons["LookUp"] ? 1 : 0)
-		- (this.buttons["LookDown"] ? 1 : 0);
+		(this.game.input.GetActionValue("LookUp") ? 1 : 0)
+		- (this.game.input.GetActionValue("LookDown") ? 1 : 0);
 	this.pitch += 2 * deltaTime * pitchChange;
+	
+	//Touch look controls
+	this.pitch += this.game.input.touchDelta[1];
+	this.yaw += this.game.input.touchDelta[0];
 	
 	//Movement controls
 	var speed = 3;
 	var forward =
-		(this.buttons["Forward"] ? speed : 0)
-		- (this.buttons["Backward"] ? speed : 0);
+		(this.game.input.GetActionValue("Forward") ? speed : 0)
+		- (this.game.input.GetActionValue("Backward") ? speed : 0);
 	var right =
-		(this.buttons["Right"] ? speed : 0)
-		- (this.buttons["Left"] ? speed : 0);
+		(this.game.input.GetActionValue("Right") ? speed : 0)
+		- (this.game.input.GetActionValue("Left") ? speed : 0);
 	
 	//Build final velocity
 	var ySpeed = this.physics.velocity[1];
@@ -162,7 +196,7 @@ Player.prototype.Update = function(deltaTime)
 	this.physics.velocity[1] = ySpeed;
 	
 	//Jump
-	if(this.buttons["Jump"] && Math.abs(this.physics.velocity[1]) < 0.01)
+	if(this.game.input.GetActionValue("Jump") && Math.abs(this.physics.velocity[1]) < 0.01)
 	{
 		this.physics.velocity[1] = 5;
 	}
@@ -176,7 +210,7 @@ Player.prototype.Update = function(deltaTime)
 	this.game.renderer.camera.yaw = this.yaw;
 	
 	//Suspend the game
-	if(this.buttons["Menu"] === true)
+	if(this.game.input.GetActionValue("Menu"))
 	{
 		this.game.Suspend();
 	}
@@ -193,3 +227,5 @@ Player.prototype.UpdateSuspended = function(deltaTime)
 	this.suspendedYawChangeAngle += deltaTime * 0.1;
 	this.game.renderer.camera.yaw = Math.sin(this.suspendedYawChangeAngle) * 1.0;
 }
+    
+    
