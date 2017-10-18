@@ -30,17 +30,6 @@ function Player(game, properties)
 	//TODO: Move me to a different object
 	this.floor = new PhysicsObject(new Plane(vec3.fromValues(0, 1, 0), 0));
 	game.physics.AddPhysicsObject(this.floor);
-
-	//Initial mouse position
-	this.mousePosition = undefined;
-	this.previousMousePosition = undefined;
-
-	//Register mouse move event
-	//TODO: Move to input
-	//$("body").mousemove(this.OnMouseMove.bind(this));
-	/*game.window.bind("touchmove", this.OnTouchMove.bind(this));
-	$("body").bind("touchbegin", this.OnTouchBegin.bind(this));
-	$("body").bind("touchend", this.OnTouchEnd.bind(this));*/
 };
 
 Player.prototype = Object.create(GameObject.prototype);
@@ -83,89 +72,14 @@ Player.prototype.SetupInput = function()
 }
 
 
-//TODO: Consider registering and deregistering this event based on mouse up/down. (And maybe hide the cursor)
-Player.prototype.OnMouseMove = function(event)
-{
-	if(this.mousePosition == undefined)
-	{
-		//Store initial value
-		this.mousePosition = vec2.fromValues(event.clientX, event.clientY);
-		this.previousMousePosition = vec2.clone(this.mousePosition);
-	}
-	else
-	{
-		//Store subsequent values
-		this.previousMousePosition = vec2.clone(this.mousePosition);
-		this.mousePosition = vec2.fromValues(event.clientX, event.clientY);
-	}
-
-	//Mouse must be held
-	if(event.which == 1)
-	{
-		//TODO: Extract this to a preferences window?
-		var mouseSensitivity = 0.002;
-		this.yaw += mouseSensitivity * (this.mousePosition[0] - this.previousMousePosition[0]);
-		this.pitch -= mouseSensitivity * (this.mousePosition[1] - this.previousMousePosition[1]);
-	}
-	
-	if(!this.game.suspended)
-	{
-		event.preventDefault();
-	}
-}
-
-
-Player.prototype.OnTouchBegin = function(event)
-{
-	this.touchPosition = undefined;
-	
-	if(!this.game.suspended)
-	{
-		event.preventDefault();
-	}
-}
-
-
-
-Player.prototype.OnTouchEnd = function(event)
-{
-	this.touchPosition = undefined;
-	
-	if(!this.game.suspended)
-	{
-		event.preventDefault();
-	}
-}
-
-Player.prototype.OnTouchMove = function(event)
-{
-	//alert(JSON.stringify(event.touches[0]));
-	var touch = event.touches.item(0);
-	if(this.touchPosition == undefined)
-	{
-		//Store initial value
-		this.touchPosition = vec2.fromValues(touch.clientX, touch.clientY);
-		this.previousTouchPosition = vec2.clone(this.touchPosition);
-	}
-	else
-	{
-		//Store subsequent values
-		this.previousTouchPosition = vec2.clone(this.touchPosition);
-		this.touchPosition = vec2.fromValues(touch.clientX, touch.clientY);
-	}
-
-	//TODO: Extract this to a preferences window?
-	var touchSensitivity = 0.02;
-	this.yaw += touchSensitivity * (this.touchPosition[0] - this.previousTouchPosition[0]);
-	this.pitch -= touchSensitivity * (this.touchPosition[1] - this.previousTouchPosition[1]);
-	
-	event.preventDefault();
-}
-
-
 //Main update - move, jump, shoot etc
 Player.prototype.Update = function(deltaTime)
 {
+	//TODO: Make these configurable
+	var keyboardSensitivity = 2;
+	var mouseSensitivity = 0.01;
+	var touchSensitivity = 0.01;
+
 	//Keyboard look controls
 	var yawChange =
 		(this.game.input.GetActionValue("LookRight") ? 1 : 0)
@@ -177,8 +91,14 @@ Player.prototype.Update = function(deltaTime)
 	this.pitch += 2 * deltaTime * pitchChange;
 	
 	//Touch look controls
-	this.pitch += this.game.input.touchDelta[1];
-	this.yaw += this.game.input.touchDelta[0];
+	this.yaw += this.game.input.touch.delta[0] * touchSensitivity;
+	this.pitch -= this.game.input.touch.delta[1] * touchSensitivity;
+	
+	//Mouse look controls
+	this.yaw += this.game.input.mouseDrag.delta[0] * mouseSensitivity;
+	this.pitch -= this.game.input.mouseDrag.delta[1] * mouseSensitivity;
+	this.yaw += this.game.input.mouse.delta[0] * mouseSensitivity;
+	this.pitch -= this.game.input.mouse.delta[1] * mouseSensitivity;
 	
 	//Movement controls
 	var speed = 3;
@@ -227,5 +147,3 @@ Player.prototype.UpdateSuspended = function(deltaTime)
 	this.suspendedYawChangeAngle += deltaTime * 0.1;
 	this.game.renderer.camera.yaw = Math.sin(this.suspendedYawChangeAngle) * 1.0;
 }
-    
-    

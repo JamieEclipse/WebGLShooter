@@ -95,12 +95,14 @@
 				{
 					//Fade out and hide the page
 					this.content.animate({ opacity: 0 }, 200);
-					setTimeout(function(obj)
+					setTimeout(function()
 					{
-						obj.content.css("visibility", "hidden");
-						obj.game.window.css("z-index", 1);
+						this.content.css("visibility", "hidden");
+
+						//Move game window in front of page
+						this.game.window.css("z-index", 1);
 						
-					}, 200, this);
+					}.bind(this), 200);
 					
 					//Unsuspend the game
 					this.game.Unsuspend();
@@ -112,6 +114,9 @@
 					this.content.css("visibility", "visible");
 					this.content.animate({ opacity: 1 }, 200);
 					
+					//Move game window behind page
+					this.game.window.css("z-index", -1);
+					
 					//No need to suspend here - this is a suspend callback
 				}
 			
@@ -122,7 +127,7 @@
 				this.game.Suspend();
 				
 				//Register "suspend" event
-				this.game.RegisterEventListener("Suspended", function(game, obj) { obj.HideGame(); }, this);
+				this.game.RegisterEventListener("Suspended", this.HideGame.bind(this));
 
 				//Load level
 				this.game.LoadLevel("Levels/Level.json", function()

@@ -1,6 +1,54 @@
 //Provides a unified interface for mobile and desktop input.
 "use strict"
 
+//Object which handles framerate independent scalar input (mouse and touch)
+function ScalarInput()
+{
+	//The new value from the input source
+	this.raw = undefined;
+
+	//The currently stored value 
+	this.current = undefined;
+
+	//A change in value directly from the input source
+	this.rawDelta = undefined;
+
+	//The input difference between the last two frames
+	this.delta = vec2.create();
+
+	this.Update = function()
+	{
+		if(this.rawDelta !== undefined)
+		{
+			//Copy raw delta into delta
+			this.delta = this.rawDelta;
+			this.rawDelta = undefined;
+		}
+		else if(this.raw === undefined)
+		{
+			//No input - no delta
+			this.delta.set([0, 0]);
+			this.current = undefined;
+		}
+		else if(this.current === undefined)
+		{
+			//Copy raw into current
+			this.current = vec2.clone(this.raw);
+
+			//No delta
+			this.delta.set([0, 0]);
+		}
+		else
+		{
+			//Calculate delta
+			vec2.subtract(this.delta, this.raw, this.current);
+
+			//Copy raw into current
+			this.current = vec2.clone(this.raw);
+		}
+	}
+}
+
 function Input(game)
 {
 	//Store reference to game
@@ -19,31 +67,57 @@ function Input(game)
 	var doc = document.querySelector("body");
 	doc.addEventListener("keydown", this.OnKeyboardInput.bind(this, true));
 	doc.addEventListener("keyup", this.OnKeyboardInput.bind(this, false));
-	
+
+	//Check for pointer lock support
+	//TODO: Listen for losing pointer lock etc.
+	this.pointerLockElement = this.game.window[0];
+	this.supportsPointerLock = false;
+	this.ResolvePointerLocking = function(pointerLockElementName, request, exit, change, moveX, moveY)
+	{
+		if(pointerLockElementName in document)
+		{
+			//Set up vendor-specific names
+			this.pointerLockElementName = pointerLockElementName;
+			this.pointerLockElement.requestPointerLock = this.pointerLockElement[request];
+			document.exitPointerLock = document[exit];
+			this.pointerLockMovementX = moveX;
+			this.pointerLockMovementY = moveY;
+			document.addEventListener(change, this.OnPointerLockChange.bind(this), false);
+
+			//Set flag
+			this.supportsPointerLock = true;
+		}
+	};
+	this.ResolvePointerLocking("pointerLockElement", "requestPointerLock", "exitPointerLock", "pointerlockchange", "movementX", "movementY");
+	this.ResolvePointerLocking("mozPointerLockElement", "mozRequestPointerLock", "mozExitPointerLock", "mozpointerlockchange", "mozMovementX", "mozMovementY");
+	this.ResolvePointerLocking("webkitPointerLockElement", "webkitRequestPointerLock", "webkitExitPointerLock", "webkitpointerlockchange", "webkitMovementX", "webkitMovementY");
+	if(this.supportsPointerLock)
+	{
+		//Lock and unlock pointer when suspended/unsuspended
+		this.game.RegisterEventListener("Suspended", this.SetPointerLockEnabled.bind(this, false));
+		this.game.RegisterEventListener("Unsuspended", this.SetPointerLockEnabled.bind(this, true));
+	}
+
 	//Mouse input
-	this.rawMousePosition = vec2.create();
-	this.mousePosition = vec2.create();
-	this.mouseDelta = vec2.create();
-	$("body").mousemove(this.OnMouseMove.bind(this));
-	
+	this.mouse = new ScalarInput();
+	this.mouseDrag = new ScalarInput();
+	document.addEventListener("mousemove", this.OnMouseMove.bind(this), false);
+	document.addEventListener("mousedown", this.OnMouseDown.bind(this), false);
+
 	//Touch input
-	this.rawTouchPosition = vec2.create();
-	this.touchPosition = vec2.create();
-	this.touchDelta = vec2.create();
+	this.touch = new ScalarInput();
 	game.window.bind("touchmove", this.OnTouchMove.bind(this));
-	$("body").bind("touchbegin", this.OnTouchBegin.bind(this));
-	$("body").bind("touchend", this.OnTouchEnd.bind(this));
+	game.window.bind("touchstart", this.OnTouchBegin.bind(this));
+	game.window.bind("touchend", this.OnTouchEnd.bind(this));
 }
 
 
 //Maintain stable mouse/touch deltas
 Input.prototype.Update = function(deltaTime)
 {
-	vec2.subtract(this.touchDelta, this.rawTouchPosition, this.touchPosition);
-	this.touchPosition = vec2.clone(this.rawTouchPosition);
-	
-	vec2.subtract(this.mouseDelta, this.rawMousePosition, this.mousePosition);
-	this.mousePosition = vec2.clone(this.rawMousePosition);
+	this.mouse.Update();
+	this.mouseDrag.Update();
+	this.touch.Update();
 }
 
 
@@ -81,10 +155,12 @@ Input.prototype.BindElement = function(button, action)
 	button.bind("touchstart", function()
 	{
 		this.uiActions[action] = true;
+		event.preventDefault();
 	}.bind(this));
 	button.bind("touchend", function()
 	{
 		this.uiActions[action] = false;
+		event.preventDefault();
 	}.bind(this));
 }
 
@@ -101,8 +177,68 @@ Input.prototype.BindKeys = function(keyCodes, action)
 
 Input.prototype.OnMouseMove = function(event)
 {
-	this.rawMousePosition = vec2.fromValues(clientX, clientY);
+	//Mouse
+	if((document[this.pointerLockElementName] === this.pointerLockElement) && (this.pointerLockMovementX in event || this.pointerLockMovementX in event))
+	{
+		//TODO: Add to delta value if it's already defined.
+		this.mouse.rawDelta = vec2.fromValues(
+			event[this.pointerLockMovementX],
+			event[this.pointerLockMovementY]);
+	}
+	
+	//Mouse drag
+	this.mouseDrag.raw = (event.buttons == 1)
+		? vec2.fromValues(event.clientX, event.clientY)
+		: undefined;
 	event.preventDefault();
+}
+
+
+Input.prototype.OnMouseDown = function(event)
+{
+	//Re-enable pointer lock when focused
+	if(this.supportsPointerLock && !this.game.suspended)
+	{
+		this.SetPointerLockEnabled(true);
+	}
+}
+
+
+//Enables or disables "pointer lock"
+Input.prototype.SetPointerLockEnabled = function(enabled)
+{
+	console.assert(this.supportsPointerLock, "Should never call this if pointer lock is not enabled.");
+	if(enabled)
+	{
+		console.log("Requested pointer lock to ", this.pointerLockElement);
+		this.pointerLockElement.requestPointerLock();
+	}
+	else
+	{
+		console.log("Exited pointer lock");
+		document.exitPointerLock();
+	}
+}
+
+
+//Callback for when pointer lock is enabled/disabled
+Input.prototype.OnPointerLockChange = function(event)
+{
+	//Check for disabled
+	if(document[this.pointerLockElementName] !== this.pointerLockElement)
+	{
+		//Treat as escape key
+		//TODO: Make this less hard coded?
+		var inputAction = this.keyBindings[27];
+		if(inputAction != undefined)
+		{
+			this.keyboardActions[inputAction] = true;
+			setTimeout(function()
+			{
+				this.keyboardActions[this.keyBindings[27]] = false;
+			}.bind(this), 10);
+		}
+	}
 }
 
 
@@ -123,8 +259,6 @@ Input.prototype.SetTouchEnabled = function(enabled)
 
 Input.prototype.OnTouchBegin = function(event)
 {
-	//this.touchPosition = undefined;
-	
 	//Enable touch input on first touch
 	this.SetTouchEnabled(true);
 	
@@ -137,7 +271,8 @@ Input.prototype.OnTouchBegin = function(event)
 
 Input.prototype.OnTouchEnd = function(event)
 {
-	//this.touchPosition = undefined;
+	//Reset position
+	this.touch.raw = undefined;
 	
 	if(!this.game.suspended)
 	{
@@ -148,8 +283,9 @@ Input.prototype.OnTouchEnd = function(event)
 
 Input.prototype.OnTouchMove = function(event)
 {
+	//Store touch data
 	var touch = event.touches.item(0);
-	this.rawTouchPosition = vec2.fromValues(touch.clientX, touch.clientY);
+	this.touch.raw = vec2.fromValues(touch.clientX, touch.clientY);
 	event.preventDefault();
 }
     

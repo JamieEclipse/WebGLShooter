@@ -9,6 +9,9 @@ function Game()
 		
 		//Get window
 		this.window = $("#glCanvas");
+
+		//Named callback arrays for communication inside and outside of the game
+		this.events = { };
 		
 		//Initialise renderer
 		this.renderer = new Renderer(this);
@@ -19,9 +22,6 @@ function Game()
 		//Initialise input
 		this.input = new Input(this);
 		
-		//Named callback arrays for communication inside and outside of the game
-		this.events = { };
-		
 		//Set up suspended and unsuspended events
 		this.RegisterEventListener("Suspended", function(game, args) { game.suspended = true; });
 		this.RegisterEventListener("Unsuspended", function(game, args) { game.suspended = false; });
@@ -31,8 +31,8 @@ function Game()
 	}
 	catch(exception)
 	{
-		console.log(exception + exception.stack);
-		alert(exception + exception.stack);
+		console.error(exception.stack);
+		//alert(exception.stack);
 	}
 };
 
@@ -59,8 +59,8 @@ Game.prototype.Run = function()
 		}
 		catch(exception)
 		{
-			console.error(exception + exception.stack);
-			alert(exception + exception.stack);
+			console.error(exception.stack);
+			//alert(exception.stack);
 		}
 	};
 	
