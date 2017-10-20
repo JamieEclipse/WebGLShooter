@@ -43,6 +43,12 @@ function Shader(gl)
 			//Sample texure
 			gl_FragColor = texture2D(uTexture, textureCoordinate);
 
+			//Cutout
+			if(gl_FragColor.w < 0.01)
+			{
+				discard;
+			}
+
 			//Apply fog
 			float fogAmount = (1.0 - gl_FragCoord.w);
 			fogAmount = clamp(fogAmount, 0.0, 1.0);
