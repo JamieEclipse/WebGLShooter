@@ -35,5 +35,7 @@
 	{ "type": "Wall", "position": [4, -1, 4] },
 
 	{ "type": "Wall", "position": [0, 0, 0], "scale": 24, "model": "Models/Floor.json", "texture": "Images/FloorLarge.png", "physics": [ { "type": "Plane", "normal": [0, 1, 0], "offset": 0 } ] },
-	{ "type": "Wall", "position": [0, 4, 0], "scale": 24, "model": "Models/Floor.json", "texture": "Images/FloorLarge.png", "physics": [ { "type": "Plane", "normal": [0, -1, 0], "offset": -4 } ] }
+	{ "type": "Wall", "position": [0, 4, 0], "scale": 24, "model": "Models/Floor.json", "texture": "Images/FloorLarge.png", "physics": [ { "type": "Plane", "normal": [0, -1, 0], "offset": -4 } ] },
+
+	{ "type": "Enemy", "position": [0, 1.5, -6] }
 ]

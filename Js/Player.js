@@ -18,18 +18,17 @@ function Player(game, properties)
 	this.LoadProperty("pitch", 0);
 	
 	//Offset from player position to camera position
-	this.cameraOffset = vec3.fromValues(0, 1.1, 0);
+	this.cameraOffset = vec3.fromValues(0, 1.3, 0);
+
+	//Offset from player position to bullet position
+	this.weaponOffset = vec3.fromValues(0, 1.15, 0);
 	
 	//The angle of the sine wave to set the yaw to
 	this.suspendedYawChangeAngle = 0.0;
 
 	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.position, 0.5));
+	this.physics = new PhysicsObject(new Sphere(this.position, 0.5), this);
 	game.physics.AddPhysicsObject(this.physics);
-
-	//TODO: Move me to a different object
-	this.floor = new PhysicsObject(new Plane(vec3.fromValues(0, 1, 0), 0));
-	game.physics.AddPhysicsObject(this.floor);
 };
 
 Player.prototype = Object.create(GameObject.prototype);
@@ -44,6 +43,7 @@ Player.prototype.SetupInput = function()
 	var KeyA = [97, 65];
 	var KeyS = [115, 83];
 	var KeyD = [100, 68];
+	var KeyF = [102, 70];
 	var KeyLeft = [37];
 	var KeyUp = [38];
 	var KeyRight = [39];
@@ -62,6 +62,8 @@ Player.prototype.SetupInput = function()
 	this.game.input.BindKeys(KeyUp, "LookUp");
 	this.game.input.BindKeys(KeyDown, "LookDown");
 	this.game.input.BindKeys(KeyEscape, "Menu");
+	//TODO: Use left click instead. Add mobile button.
+	this.game.input.BindKeys(KeyF, "Shoot")
 	
 	//Register buttons
 	this.game.input.BindElement($("#jumpButton"), "Jump");
@@ -128,6 +130,33 @@ Player.prototype.Update = function(deltaTime)
 	vec3.add(this.game.renderer.camera.position, this.position, this.cameraOffset);
 	this.game.renderer.camera.pitch = this.pitch;
 	this.game.renderer.camera.yaw = this.yaw;
+
+	//Shoot
+	//TODO: Add support for "click" inputs
+	var shoot = this.game.input.GetActionValue("Shoot");
+	if(shoot && (shoot != this.shootPrevious))
+	{
+		//Create bullet
+		var bullet = new Bullet(this.game);
+		this.game.objects.push(bullet);
+
+		//Calculate direction
+		//TODO: Move these calculations into the bullet?
+		var direction = vec3.fromValues(0, 0, -1);
+		vec3.rotateX(direction, direction, vec3.create(), this.pitch);
+		vec3.rotateY(direction, direction, vec3.create(), -this.yaw);
+
+		//Calculate velocity
+		vec3.scale(bullet.physics.velocity, direction, 40);
+
+		//Calculate position
+		vec3.add(bullet.position, this.position, this.weaponOffset);
+
+		//Set bullet's orientation
+		bullet.yaw = this.yaw;
+		bullet.pitch = this.pitch;
+	}
+	this.shootPrevious = shoot;
 	
 	//Suspend the game
 	if(this.game.input.GetActionValue("Menu"))

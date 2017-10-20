@@ -90,7 +90,20 @@ Game.prototype.Update = function(deltaTime, updateType)
 	//Update all game objects
 	for(i in this.objects)
 	{
-		this.objects[i][updateType](deltaTime);
+		if(this.objects[i])
+		{
+			this.objects[i][updateType](deltaTime);
+		}
+	}
+
+	//Clean up null objects
+	for(var i = 0; i < this.objects.length; ++i)
+	{
+		if(!this.objects[i])
+		{
+			this.objects.splice(i, 1);
+			--i;
+		}
 	}
 	
 	//Render
@@ -113,6 +126,21 @@ Game.prototype.LoadLevel = function(file, callback)
 		//Run callback
 		callback();
 	}.bind(this));
+}
+
+
+//Remove an object from the game
+Game.prototype.RemoveObject = function(object)
+{
+	for(var i = 0; i < this.objects.length; ++i)
+	{
+		if(this.objects[i] == object)
+		{
+			this.objects[i].Destroy();
+			this.objects[i] = null;
+			return;
+		}
+	}
 }
 
 

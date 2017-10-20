@@ -17,6 +17,16 @@ function Physics(game)
 
 Physics.prototype.Update = function(deltaTime)
 {
+    //Remove null objects
+    for(var i = 0; i < this.objects.length; ++i)
+    {
+        if(!this.objects[i])
+        {
+            this.objects.splice(i, 1);
+            --i;
+        }
+    }
+
     //Move objects and mark them as awake
     for(var i in this.objects)
     {
@@ -34,23 +44,35 @@ Physics.prototype.Update = function(deltaTime)
     for(var i = 0; i < this.objects.length; ++i)
     {
         var objectI = this.objects[i];
-        if(objectI.awake)
+        if(objectI && objectI.awake)
         {
             for(var j = 0; j < this.objects.length; ++j)
             {
 				if(i != j)
 				{
 					var objectJ = this.objects[j];
-					
-					var intersect = objectI.shape.Intersect(objectJ.shape);
-					if(intersect.intersects)
-					{
-						vec3.scaleAndAdd(objectI.shape.position, objectI.shape.position, intersect.normal, intersect.penetration);
-				
-						//Remove velocity in -normal direction
-						var speedAlongNormal = vec3.dot(intersect.normal, objectI.velocity);
-						vec3.scaleAndAdd(objectI.velocity, objectI.velocity, intersect.normal, Math.max(0, -speedAlongNormal));
-					}
+                    if(objectJ)
+                    {
+                        var intersect = objectI.shape.Intersect(objectJ.shape);
+                        if(intersect.intersects)
+                        {
+                            //Send callbacks
+                            if(objectI.OnCollision !== undefined)
+                            {
+                                objectI.OnCollision(objectJ, intersect);
+                            }
+                            if(objectJ.OnCollision !== undefined)
+                            {
+                                objectJ.OnCollision(objectI, intersect);
+                            }
+
+                            vec3.scaleAndAdd(objectI.shape.position, objectI.shape.position, intersect.normal, intersect.penetration);
+                    
+                            //Remove velocity in -normal direction
+                            var speedAlongNormal = vec3.dot(intersect.normal, objectI.velocity);
+                            vec3.scaleAndAdd(objectI.velocity, objectI.velocity, intersect.normal, Math.max(0, -speedAlongNormal));
+                        }
+                    }
 				}
             }
         }
@@ -62,4 +84,17 @@ Physics.prototype.Update = function(deltaTime)
 Physics.prototype.AddPhysicsObject = function(object)
 {
     this.objects.push(object);
+}
+
+//Remove a physics object from the system
+Physics.prototype.RemovePhysicsObject = function(object)
+{
+    for(var i = 0; i < this.objects.length; ++i)
+    {
+        if(this.objects[i] == object)
+        {
+            this.objects[i] = null;
+            return;
+        }
+    }
 }

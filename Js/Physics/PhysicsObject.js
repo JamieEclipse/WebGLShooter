@@ -1,7 +1,7 @@
 //Represents one physicalised object
 "use strict"
 
-function PhysicsObject(shape)
+function PhysicsObject(shape, owner)
 {
     //Store shape
     this.shape = shape;
@@ -11,4 +11,10 @@ function PhysicsObject(shape)
 
     //Start asleep
     this.awake = false;
+
+    //Store a context for this physics object
+    this.owner = owner;
+    
+    //Collision callback
+    this.OnCollision = undefined;
 }

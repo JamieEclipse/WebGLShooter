@@ -15,6 +15,10 @@ function GameObject(game, properties)
 GameObject.prototype.Update = function(deltaTime) { }
 
 
+//Called when this GameObject is removed from the game
+GameObject.prototype.Destroy = function() { }
+
+
 //Alternative update loop to call when the game is suspended (i.e. unfocused)
 GameObject.prototype.UpdateSuspended = function(deltaTime) { };
 
