@@ -3,6 +3,17 @@ function Game()
 {
 	try
 	{
+		//Create logger
+		try
+		{
+			this.logger = new Logger(this);
+		}
+		catch(exception)
+		{
+			alert("Failed to create logger!\n" + exception.stack);
+			return;
+		}
+		
 		//Run state
 		this.suspended = false;
 		//TODO: Pause - another bool or switch to an "enum"?
@@ -31,8 +42,7 @@ function Game()
 	}
 	catch(exception)
 	{
-		console.error(exception.stack);
-		//alert(exception.stack);
+		this.logger.error(exception.stack);
 	}
 };
 
@@ -41,7 +51,7 @@ function Game()
 Game.prototype.Run = function()
 {
 	//Main update loop
-	var UpdateLoop = function(game)
+	var UpdateLoop = function()
 	{
 		//Constant tick time
 		const deltaTime = 1 / 30;
@@ -49,23 +59,22 @@ Game.prototype.Run = function()
 		
 		//Schedule next tick immediately
 		//TODO: Throttle if ticks overlap
-		setTimeout(UpdateLoop, deltaTimeMs, game);
+		setTimeout(UpdateLoop, deltaTimeMs);
 		
 		//Catch any runtime exceptions without crashing the game
 		try
 		{
 			//Update
-			game.Update(deltaTime, game.suspended ? "UpdateSuspended" : "Update");
+			this.Update(deltaTime, this.suspended ? "UpdateSuspended" : "Update");
 		}
 		catch(exception)
 		{
-			console.error(exception.stack);
-			//alert(exception.stack);
+			this.logger.error(exception.stack);
 		}
-	};
+	}.bind(this);
 	
 	//Begin the update loop
-	UpdateLoop(this);
+	UpdateLoop();
 }
 
 
@@ -77,7 +86,7 @@ Game.prototype.Update = function(deltaTime, updateType)
 	
 	//Update input
 	this.input.Update(deltaTime);
-
+	
 	//Update all game objects
 	for(i in this.objects)
 	{
@@ -113,7 +122,7 @@ Game.prototype.BroadcastEvent = function(eventName)
 	//Check the event exists
 	if(!(eventName in this.events))
 	{
-		console.log("Event " + eventName + " has no listeners.");
+		this.logger.log("Event " + eventName + " has no listeners.");
 		return;
 	}
 	

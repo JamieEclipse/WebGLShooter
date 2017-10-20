@@ -6,6 +6,24 @@
 	z-index: -1;
 }
 
+#logger
+{
+	position: fixed;
+	z-index: 10;
+	background-color: rgba(0, 0, 0, 0.3);
+	color: white;
+}
+
+#logger .error
+{
+	color: red;
+}
+
+#logger .warn
+{
+	color: yellow;
+}
+
 .uiButton
 {
 	color: #FFFFFFDD;
