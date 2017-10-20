@@ -20,6 +20,7 @@ function Renderer(game)
 	//Initialise gl settings
 	this.gl.enable(this.gl.DEPTH_TEST);
 	this.gl.depthFunc(this.gl.LEQUAL);
+	this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 	
 	//Initialise camera
 	this.camera = new Camera();
@@ -35,7 +36,7 @@ Renderer.prototype.Draw = function()
 	this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 	
 	//Draw all game objects
-	for(i in this.game.objects)
+	for(var i in this.game.objects)
 	{
 		this.game.objects[i].Draw();
 	}

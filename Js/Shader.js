@@ -114,7 +114,7 @@ Shader.prototype.LoadShader = function(gl, type, source)
 //Binds all textures in "textures"
 Shader.prototype.BindTextures = function(gl)
 {
-	for(i in this.textures)
+	for(var i in this.textures)
 	{
 		gl.activeTexture(gl["TEXTURE" + i]);
 		gl.bindTexture(gl.TEXTURE_2D, this.textures[i]);
