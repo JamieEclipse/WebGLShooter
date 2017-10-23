@@ -32,25 +32,24 @@ Logger.prototype.GenericLog = function(verbosity)
 	var logArguments = Array.prototype.slice.call(arguments, 1);
 	
 	//Log to console
-	console[verbosity](logArguments);
+	console[verbosity](...logArguments);
 	
 	//Push data
-	this.logData.push({ verbosity: verbosity, data: logArguments });
+	this.logData.push({ verbosity: verbosity, text: logArguments.join(" ") });
 	
 	//Maintain max length
-	if(this.logData.length > 6)
+	if(this.logData.length > 20)
 	{
 		this.logData = this.logData.splice(1);
 	}
 	
 	//Show on screen
 	this.logElement.empty();
-	for(var i in this.logData)
+	for(var i = this.logData.length - 1; i >= 0; --i)
 	{
-		var text = this.logData[i].data.join(" ");
 		var row = this.logElement.append(
 			"<div class='" + this.logData[i].verbosity
-			+ "'>" + text + "</div>");
+			+ "'>" + this.logData[i].text + "</div>");
 	}
 }
 
