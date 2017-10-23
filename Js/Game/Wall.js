@@ -7,8 +7,8 @@ function Wall(game, properties)
 {
 	GameObject.call(this, game, properties);
 
-	//Position
-	this.LoadVectorProperty("position");
+	//Transform
+	this.transform = new TransformComponent(this, this.properties);
 	
 	//Wall model
 	//TODO: Reference a centralised asset
@@ -52,7 +52,7 @@ function Wall(game, properties)
 	}
 	else
 	{
-		var physics = new PhysicsObject(new BoundingBox(this.position, vec3.fromValues(0.5 * this.scale, 0.5 * this.scale, 0.5 * this.scale)));
+		var physics = new PhysicsObject(new BoundingBox(this.transform.position, vec3.fromValues(0.5 * this.scale, 0.5 * this.scale, 0.5 * this.scale)));
 		game.physics.AddPhysicsObject(physics);
 	}
 };
@@ -63,7 +63,5 @@ Wall.prototype.constructor = Wall;
 
 Wall.prototype.Draw = function()
 {
-	var modelMatrix = mat4.create();
-	mat4.translate(modelMatrix, modelMatrix, this.position);
-	this.game.renderer.DrawModel(this.model, this.shader, modelMatrix);
+	this.game.renderer.DrawModel(this.model, this.shader, this.transform.GetTransform());
 }

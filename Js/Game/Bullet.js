@@ -9,16 +9,11 @@ function Bullet(game, properties)
 	//The object which fired the bullet
 	this.owner = null;
 
-	//Position
-	this.LoadVectorProperty("position");
-	this.startingPosition = vec3.clone(this.position);
-	
-	//Direction
-	this.LoadProperty("yaw", 0);
-	this.LoadProperty("pitch", 0);
+	//Transform
+	this.transform = new TransformComponent(this, this.properties);
 
 	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.position, 0.1), this);
+	this.physics = new PhysicsObject(new Sphere(this.transform.position, 0.1), this);
     game.physics.AddPhysicsObject(this.physics);
     this.physics.OnCollision = this.OnCollision.bind(this);
     
@@ -39,18 +34,7 @@ Bullet.prototype.constructor = Bullet;
 
 Bullet.prototype.Draw = function()
 {
-	var modelMatrix = mat4.create();
-	mat4.translate(modelMatrix, modelMatrix, this.position);
-	mat4.rotate(modelMatrix,
-		modelMatrix,
-		this.yaw,
-		[0, -1, 0]);
-	mat4.rotate(modelMatrix,
-		modelMatrix,
-		this.pitch,
-		[1, 0, 0]);
-	
-	this.game.renderer.DrawModel(this.model, this.shader, modelMatrix);
+	this.game.renderer.DrawModel(this.model, this.shader, this.transform.GetTransform());
 }
 
 

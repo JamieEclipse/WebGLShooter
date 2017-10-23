@@ -9,13 +9,11 @@ function Player(game, properties)
 	//Ready for input
 	this.SetupInput();
 
-	//Position
-	this.LoadVectorProperty("position");
-	this.startingPosition = vec3.clone(this.position);
-	
-	//Direction
-	this.LoadProperty("yaw", 0);
-	this.LoadProperty("pitch", 0);
+	//Transform
+	this.transform = new TransformComponent(this, this.properties);
+
+	//Starting position (for rotating while suspended)
+	this.startingPosition = vec3.clone(this.transform.position);
 	
 	//Offset from player position to camera position
 	this.cameraOffset = vec3.fromValues(0, 1.3, 0);
@@ -25,11 +23,12 @@ function Player(game, properties)
 	
 	//The angle of the sine wave to set the yaw to
 	this.suspendedYawChangeAngle = 0.0;
-
+	
 	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.position, 0.5), this);
+	this.physics = new PhysicsObject(new Sphere(this.transform.position, 0.5), this);
 	game.physics.AddPhysicsObject(this.physics);
 };
+
 
 Player.prototype = Object.create(GameObject.prototype);
 Player.prototype.constructor = Player;
@@ -86,21 +85,21 @@ Player.prototype.Update = function(deltaTime)
 	var yawChange =
 		(this.game.input.GetActionValue("LookRight") ? 1 : 0)
 		- (this.game.input.GetActionValue("LookLeft") ? 1 : 0);
-	this.yaw += 2 * deltaTime * yawChange;
+	this.transform.rotation[1] += 2 * deltaTime * yawChange;
 	var pitchChange =
 		(this.game.input.GetActionValue("LookUp") ? 1 : 0)
 		- (this.game.input.GetActionValue("LookDown") ? 1 : 0);
-	this.pitch += 2 * deltaTime * pitchChange;
+	this.transform.rotation[0] += 2 * deltaTime * pitchChange;
 	
 	//Touch look controls
-	this.yaw += this.game.input.touch.delta[0] * touchSensitivity;
-	this.pitch -= this.game.input.touch.delta[1] * touchSensitivity;
+	this.transform.rotation[1] += this.game.input.touch.delta[0] * touchSensitivity;
+	this.transform.rotation[0] -= this.game.input.touch.delta[1] * touchSensitivity;
 	
 	//Mouse look controls
-	this.yaw += this.game.input.mouseDrag.delta[0] * mouseSensitivity;
-	this.pitch -= this.game.input.mouseDrag.delta[1] * mouseSensitivity;
-	this.yaw += this.game.input.mouse.delta[0] * mouseSensitivity;
-	this.pitch -= this.game.input.mouse.delta[1] * mouseSensitivity;
+	this.transform.rotation[1] += this.game.input.mouseDrag.delta[0] * mouseSensitivity;
+	this.transform.rotation[0] -= this.game.input.mouseDrag.delta[1] * mouseSensitivity;
+	this.transform.rotation[1] += this.game.input.mouse.delta[0] * mouseSensitivity;
+	this.transform.rotation[0] -= this.game.input.mouse.delta[1] * mouseSensitivity;
 	
 	//Movement controls
 	var speed = 3;
@@ -114,7 +113,7 @@ Player.prototype.Update = function(deltaTime)
 	//Build final velocity
 	var ySpeed = this.physics.velocity[1];
 	this.physics.velocity.set([right, 0, -forward]);
-	vec3.rotateY(this.physics.velocity, this.physics.velocity, vec3.create(), -this.yaw);
+	vec3.rotateY(this.physics.velocity, this.physics.velocity, vec3.create(), -this.transform.rotation[1]);
 	this.physics.velocity[1] = ySpeed;
 	
 	//Jump
@@ -127,9 +126,9 @@ Player.prototype.Update = function(deltaTime)
 	this.physics.velocity[1] -= 9.8 * deltaTime;
 
 	//Move the camera
-	vec3.add(this.game.renderer.camera.position, this.position, this.cameraOffset);
-	this.game.renderer.camera.pitch = this.pitch;
-	this.game.renderer.camera.yaw = this.yaw;
+	vec3.add(this.game.renderer.camera.position, this.transform.position, this.cameraOffset);
+	this.game.renderer.camera.pitch = this.transform.rotation[0];
+	this.game.renderer.camera.yaw = this.transform.rotation[1];
 
 	//Shoot
 	//TODO: Add support for "click" inputs
@@ -143,18 +142,17 @@ Player.prototype.Update = function(deltaTime)
 		//Calculate direction
 		//TODO: Move these calculations into the bullet?
 		var direction = vec3.fromValues(0, 0, -1);
-		vec3.rotateX(direction, direction, vec3.create(), this.pitch);
-		vec3.rotateY(direction, direction, vec3.create(), -this.yaw);
+		vec3.rotateX(direction, direction, vec3.create(), this.transform.rotation[0]);
+		vec3.rotateY(direction, direction, vec3.create(), -this.transform.rotation[1]);
 
 		//Calculate velocity
 		vec3.scale(bullet.physics.velocity, direction, 40);
 
 		//Calculate position
-		vec3.add(bullet.position, this.position, this.weaponOffset);
+		vec3.add(bullet.transform.position, this.transform.position, this.weaponOffset);
 
 		//Set bullet's orientation
-		bullet.yaw = this.yaw;
-		bullet.pitch = this.pitch;
+		bullet.transform.rotation = vec3.clone(this.transform.rotation);
 	}
 	this.shootPrevious = shoot;
 	
