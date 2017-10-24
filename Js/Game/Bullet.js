@@ -4,23 +4,23 @@
 
 function Bullet(game, properties)
 {
-	GameObject.call(this, game, properties);
+	this.properties = { };
+	this.properties.physics = [{ "shape": "Sphere", "radius": 0.1 }];
+	this.properties.model = "Models/Billboard.json";
+	this.properties.texture = "Images/Bullet.png";
 
+	GameObject.call(this, game, properties);
+	
 	//The object which fired the bullet
 	this.owner = null;
 
-	//Transform
+	//Components
 	this.AddComponent("TransformComponent", "transform");
-
-	//Model
-	this.properties.model = "Models/Billboard.json";
-	this.properties.texture = "Images/Bullet.png";
+	this.AddComponent("PhysicsComponent", "physics");
 	this.AddComponent("ModelComponent", "model");
 
 	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.transform.position, 0.1), this);
-    this.game.physics.AddPhysicsObject(this.physics);
-	this.physics.OnCollision = this.OnCollision.bind(this);
+	this.physics.physicsObject.OnCollision = this.OnCollision.bind(this);
 };
 
 Bullet.prototype = Object.create(GameObject.prototype);

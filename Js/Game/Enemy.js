@@ -8,19 +8,17 @@ function Enemy(game, properties)
 	this.properties.model = "Models/Billboard.json";
 	this.properties.texture = "Images/EyeBall.png";
 	this.properties.scale = 2;
+	this.properties.physics = [{ shape: "Sphere", radius: 1 }];
 
 	GameObject.call(this, game, properties);
 
-	//Transform
+	//Components
 	this.AddComponent("TransformComponent", "transform");
-	
-	//Models
 	this.AddComponent("ModelComponent", "model");
+	this.AddComponent("PhysicsComponent", "physics");
 
 	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.transform.position, 1), this);
-    game.physics.AddPhysicsObject(this.physics);
-    this.physics.OnCollision = this.OnCollision.bind(this);
+    this.physics.physicsObject.OnCollision = this.OnCollision.bind(this);
 
 	//Health
 	this.LoadProperty("health", 3);
@@ -52,10 +50,4 @@ Enemy.prototype.Damage = function(amount)
 	{
 		this.game.RemoveObject(this);
 	}
-}
-
-
-Enemy.prototype.Destroy = function()
-{
-	this.game.physics.RemovePhysicsObject(this.physics);
 }

@@ -4,13 +4,17 @@
 
 function Player(game, properties)
 {
+	this.properties = { };
+	this.properties.physics = [{ shape: "Sphere", radius: 0.5 }];
+
 	GameObject.call(this, game, properties);
 	
 	//Ready for input
 	this.SetupInput();
-
-	//Transform
-	this.transform = new TransformComponent(this, this.properties);
+	
+	//Components
+	this.AddComponent("TransformComponent", "transform");
+	this.AddComponent("PhysicsComponent", "physics");
 
 	//Starting position (for rotating while suspended)
 	this.startingPosition = vec3.clone(this.transform.position);
@@ -23,10 +27,6 @@ function Player(game, properties)
 	
 	//The angle of the sine wave to set the yaw to
 	this.suspendedYawChangeAngle = 0.0;
-	
-	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.transform.position, 0.5), this);
-	game.physics.AddPhysicsObject(this.physics);
 };
 
 
@@ -111,19 +111,19 @@ Player.prototype.Update = function(deltaTime)
 		- (this.game.input.GetActionValue("Left") ? speed : 0);
 	
 	//Build final velocity
-	var ySpeed = this.physics.velocity[1];
-	this.physics.velocity.set([right, 0, -forward]);
-	vec3.rotateY(this.physics.velocity, this.physics.velocity, vec3.create(), -this.transform.rotation[1]);
-	this.physics.velocity[1] = ySpeed;
+	var ySpeed = this.physics.physicsObject.velocity[1];
+	this.physics.physicsObject.velocity.set([right, 0, -forward]);
+	vec3.rotateY(this.physics.physicsObject.velocity, this.physics.physicsObject.velocity, vec3.create(), -this.transform.rotation[1]);
+	this.physics.physicsObject.velocity[1] = ySpeed;
 	
 	//Jump
-	if(this.game.input.GetActionValue("Jump") && Math.abs(this.physics.velocity[1]) < 0.01)
+	if(this.game.input.GetActionValue("Jump") && Math.abs(this.physics.physicsObject.velocity[1]) < 0.01)
 	{
-		this.physics.velocity[1] = 5;
+		this.physics.physicsObject.velocity[1] = 5;
 	}
 
 	//Gravity
-	this.physics.velocity[1] -= 9.8 * deltaTime;
+	this.physics.physicsObject.velocity[1] -= 9.8 * deltaTime;
 
 	//Move the camera
 	vec3.add(this.game.renderer.camera.position, this.transform.position, this.cameraOffset);
@@ -146,7 +146,7 @@ Player.prototype.Update = function(deltaTime)
 		vec3.rotateY(direction, direction, vec3.create(), -this.transform.rotation[1]);
 
 		//Calculate velocity
-		vec3.scale(bullet.physics.velocity, direction, 40);
+		vec3.scale(bullet.physics.physicsObject.velocity, direction, 40);
 
 		//Calculate position
 		vec3.add(bullet.transform.position, this.transform.position, this.weaponOffset);
