@@ -39,6 +39,9 @@ function Game()
 		
 		//Initialise objects
 		this.objects = [ ];
+
+		//List of loaded classes, from code or json
+		this.classes = { };
 	}
 	catch(exception)
 	{
@@ -111,21 +114,108 @@ Game.prototype.Update = function(deltaTime, updateType)
 }
 
 
+//Loads a class from json
+//TODO: Handle failure to load?
+Game.prototype.LoadClassForLevel = function(className, loadingData)
+{
+	$.getJSON("Objects/" + className + ".json", {}, function(data, json)
+	{
+		//Create class constructor
+		this.classes[className] = function(game, properties)
+		{
+			//Copy properties
+			this.properties = json.properties;
+
+			//Load properties etc
+			GameObject.call(this, game, properties);
+
+			//Add components
+			for(var name in json.components)
+			{
+				this.AddComponent(json.components[name], name);
+			}
+		};
+
+		//Inherit from GameObject
+		this.classes[className].prototype = Object.create(GameObject.prototype);
+		this.classes[className].prototype.constructor = this.classes[className];
+
+		//Reduce class loading counter
+		--loadingData.numClassesLeftToLoad;
+
+		//Classes finished - load the level
+		if(loadingData.numClassesLeftToLoad == 0)
+		{
+			this.LoadLevelCallback(data);
+		}
+	}.bind(this, loadingData));
+}
+
+
 //Load a level from json
+//TODO: Catch exceptions. Log errors.
 Game.prototype.LoadLevel = function(file, callback)
 {
 	$.getJSON(file, {}, function(json)
 	{
-		//Load objects
+		//Find classes
+		var classesToLoad = [ ];
 		for(var i = 0; i < json.length; ++i)
 		{
 			var objectData = json[i];
-			this.objects.push(new window[objectData.type](this, objectData));
+			if(!(objectData.type in this.classes))
+			{
+				if(objectData.type in window)
+				{
+					//Hard coded classes
+					this.classes[objectData.type] = window[objectData.type];
+				}
+				else
+				{
+					//Json classes
+					classesToLoad.push(objectData.type);
+				}
+			}
 		}
 
-		//Run callback
-		callback();
+		//Create level loading data
+		var loadingData = {
+			objects: json,
+			numClassesLeftToLoad: classesToLoad.length,
+			callback: callback
+		};
+		
+		if(loadingData.numClassesLeftToLoad > 0)
+		{
+			//Load json classes first
+			for(var i = 0; i < classesToLoad.length; ++i)
+			{
+				var className = classesToLoad[i];
+				this.LoadClassForLevel(className, loadingData);
+			}
+		}
+		else
+		{
+			//Load level directly
+			this.LoadLevelCallback(loadingData);
+		}
 	}.bind(this));
+}
+
+
+//Loads a level from already-loaded json data, with the classes guaranteed to be loaded
+//TODO: Catch exceptions. Log errors.
+Game.prototype.LoadLevelCallback = function(data)
+{
+	//Load objects
+	for(var i = 0; i < data.objects.length; ++i)
+	{
+		var objectData = data.objects[i];
+		this.objects.push(new this.classes[objectData.type](this, objectData));
+	}
+
+	//Run callback
+	data.callback();
 }
 
 

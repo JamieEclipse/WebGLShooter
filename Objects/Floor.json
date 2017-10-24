@@ -1,0 +1,12 @@
+{
+	"components": { "transform": "TransformComponent", "model": "ModelComponent", "physics": "PhysicsComponent" },
+	"properties":
+	{
+		"model": "Models/Floor.json",
+		"texture": "Images/FloorLarge.png",
+		"scale": 24,
+		
+		"physics": [ { "shape": "Plane", "normal": [0, 1, 0], "offset": 0 } ] 
+	}
+
+}
