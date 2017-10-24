@@ -4,30 +4,23 @@
 
 function Enemy(game, properties)
 {
+	this.properties = { };
+	this.properties.model = "Models/Billboard.json";
+	this.properties.texture = "Images/EyeBall.png";
+	this.properties.scale = 2;
+
 	GameObject.call(this, game, properties);
 
-	//Position
-	this.LoadVectorProperty("position");
-	this.startingPosition = vec3.clone(this.position);
+	//Transform
+	this.AddComponent("TransformComponent", "transform");
 	
-	//Direction
-	this.LoadProperty("yaw", 0);
-	this.LoadProperty("pitch", 0);
+	//Models
+	this.AddComponent("ModelComponent", "model");
 
 	//Set up collisions
-	this.physics = new PhysicsObject(new Sphere(this.position, 1), this);
+	this.physics = new PhysicsObject(new Sphere(this.transform.position, 1), this);
     game.physics.AddPhysicsObject(this.physics);
     this.physics.OnCollision = this.OnCollision.bind(this);
-    
-    //Load model, texture and shader
-	//TODO: Reference centralised assets
-	this.LoadProperty("scale", 2);
-	var modelFile = this.GetProperty("model", "Models/Billboard.json");
-	this.model = new Model(game.renderer.gl, modelFile, this.scale);
-	var textureFile = this.GetProperty("texture", "Images/EyeBall.png");
-	this.texture = new Texture(game.renderer.gl, textureFile);
-	this.shader = new Shader(game.renderer.gl);
-	this.shader.textures = [this.texture.texture];
 
 	//Health
 	this.LoadProperty("health", 3);
@@ -35,14 +28,6 @@ function Enemy(game, properties)
 
 Enemy.prototype = Object.create(GameObject.prototype);
 Enemy.prototype.constructor = Enemy;
-
-
-Enemy.prototype.Draw = function()
-{
-	var modelMatrix = mat4.create();
-	mat4.translate(modelMatrix, modelMatrix, this.position);
-	this.game.renderer.DrawModel(this.model, this.shader, modelMatrix);
-}
 
 
 Enemy.prototype.OnCollision = function(object, intersect)

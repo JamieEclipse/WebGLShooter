@@ -5,6 +5,13 @@
 
 function Wall(game, properties)
 {
+	//Default properties
+	//TODO: Move this to json
+	this.properties = { };
+	this.properties.scale = 4;
+	this.properties.model = "Models/Cube.json";
+	this.properties.texture = "Images/Wall.png";
+
 	GameObject.call(this, game, properties);
 
 	//Transform
@@ -12,19 +19,10 @@ function Wall(game, properties)
 	
 	//Wall model
 	//TODO: Reference a centralised asset
-	this.LoadProperty("scale", 4);
-	var modelFile = this.GetProperty("model", "Models/Cube.json");
-	this.model = new Model(game.renderer.gl, modelFile, this.scale);
-	
-	//Wall texture
-	var textureFile = this.GetProperty("texture", "Images/Wall.png");
-	this.texture = new Texture(game.renderer.gl, textureFile);
-	
-	//Wall shader
-	this.shader = new Shader(game.renderer.gl);
-	this.shader.textures = [this.texture.texture];
+	this.AddComponent("ModelComponent", "model");
 
 	//Physics
+	var scale = this.GetProperty("scale", 1);
 	if("physics" in this.properties)
 	{
 		//Loop through physics data
@@ -52,16 +50,10 @@ function Wall(game, properties)
 	}
 	else
 	{
-		var physics = new PhysicsObject(new BoundingBox(this.transform.position, vec3.fromValues(0.5 * this.scale, 0.5 * this.scale, 0.5 * this.scale)));
+		var physics = new PhysicsObject(new BoundingBox(this.transform.position, vec3.fromValues(0.5 * scale, 0.5 * scale, 0.5 * scale)));
 		game.physics.AddPhysicsObject(physics);
 	}
 };
 
 Wall.prototype = Object.create(GameObject.prototype);
 Wall.prototype.constructor = Wall;
-
-
-Wall.prototype.Draw = function()
-{
-	this.game.renderer.DrawModel(this.model, this.shader, this.transform.GetTransform());
-}

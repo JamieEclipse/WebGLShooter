@@ -11,7 +11,11 @@ function GameObject(game, properties)
 	this.game = game;
 
 	//Store a reference back to the object's default values
-	this.properties = properties;
+	if(this.properties === undefined)
+	{
+		this.properties = { };
+	}
+	Object.assign(this.properties, properties);
 
 	//Array of components
 	this.components = { };
@@ -25,6 +29,18 @@ GameObject.prototype.CallOnComponents = function(functionName)
 	{
 		this.components[i][functionName](...Array.prototype.slice.call(arguments, 1));
 	}
+}
+
+
+//Create a component, given a constructor name
+GameObject.prototype.AddComponent = function(type, name)
+{
+	var component = new window[type](this, this.properties);
+
+	this[name] = component;
+	this.components[name] = component;
+
+	return component;
 }
 
 
