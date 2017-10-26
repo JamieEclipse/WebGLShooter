@@ -12,8 +12,9 @@ function Model(gl, data, scale = 1)
 	this.texCoordBuffer = gl.createBuffer();
 	this.indexBuffer = gl.createBuffer();
 	
-	//Loaded flag
+	//Loaded flag and callbacks
 	this.loaded = false;
+	this.loadedCallbacks = [ ];
 
 	//Store scale
 	this.scale = scale;
@@ -65,6 +66,12 @@ function Model(gl, data, scale = 1)
 			//Write initial values to buffers
 			this.loaded = true;
 			this.WriteToBuffers(this.gl);
+
+			//Call callbacks
+			for(var i in this.loadedCallbacks)
+			{
+				this.loadedCallbacks[i]();
+			}
 		}.bind(this));
 	}
 }

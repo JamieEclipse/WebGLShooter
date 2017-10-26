@@ -24,6 +24,11 @@ function PhysicsComponent(gameObject, properties)
 				shape = new BoundingBox(gameObject.transform.position, vec3.fromValues(...physicsData.size));
 				break;
 
+				case "Mesh":
+				//TODO: Remove hard reference to model and transform components?
+				shape = new Mesh(gameObject.transform.position, gameObject.model.model);
+				break;
+
 				case "Plane":
 				shape = new Plane(physicsData.normal, physicsData.offset);
 				break;
