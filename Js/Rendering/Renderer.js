@@ -21,6 +21,8 @@ function Renderer(game)
 	this.gl.enable(this.gl.DEPTH_TEST);
 	this.gl.depthFunc(this.gl.LEQUAL);
 	this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+	this.gl.enable(this.gl.CULL_FACE);
+	this.gl.cullFace(this.gl.FRONT);
 	
 	//Initialise camera
 	this.camera = new Camera();
