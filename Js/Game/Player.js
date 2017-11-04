@@ -49,6 +49,7 @@ Player.prototype.SetupInput = function()
 	var KeyDown = [40];
 	var KeySpace = [32];
 	var KeyEscape = [27];
+	var KeyShift = [16];
 	
 	//Bind keys
 	this.game.input.BindKeys(KeyW, "Forward");
@@ -62,7 +63,8 @@ Player.prototype.SetupInput = function()
 	this.game.input.BindKeys(KeyDown, "LookDown");
 	this.game.input.BindKeys(KeyEscape, "Menu");
 	//TODO: Use left click instead. Add mobile button.
-	this.game.input.BindKeys(KeyF, "Shoot")
+	this.game.input.BindKeys(KeyF, "Shoot");
+	this.game.input.BindKeys(KeyShift, "Sprint");
 	
 	//Register buttons
 	this.game.input.BindElement($("#jumpButton"), "Jump");
@@ -102,7 +104,7 @@ Player.prototype.Update = function(deltaTime)
 	this.transform.rotation[0] -= this.game.input.mouse.delta[1] * mouseSensitivity;
 	
 	//Movement controls
-	var speed = 3;
+	var speed = this.game.input.GetActionValue("Sprint") ? 6 : 3;
 	var forward =
 		(this.game.input.GetActionValue("Forward") ? speed : 0)
 		- (this.game.input.GetActionValue("Backward") ? speed : 0);
