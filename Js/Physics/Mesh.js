@@ -9,6 +9,9 @@ function Mesh(position, model, scale = 1)
 	this.position = position;
 	this.model = model;
 
+	//More iterations
+	this.iterations = 8;
+
 	//Not initialised until the model is loaded
 	this.triangleCount = 0;
 	
@@ -57,6 +60,7 @@ Mesh.prototype.Initialise = function()
 		vec3.normalize(tangent, tangent);
 		vec3.normalize(bitangent, bitangent);
 		vec3.cross(normal, bitangent, tangent);
+		vec3.normalize(normal, normal);
 		this.triangleFaces.push({ normal: vec3.clone(normal), offset: vec3.dot(triangle[0], normal) });
 
 		//Generate edge planes
@@ -82,11 +86,14 @@ Mesh.prototype.Initialise = function()
 //Returns { intersects:bool, [penetration:number, normal:vec3] } (Normal points toward this)
 Mesh.prototype.IntersectSphere = function(sphere)
 {
+	var output = { intersects: false };
+
 	for(var i = 0; i < this.triangleCount; ++i)
 	{
 		var plane = this.triangleFaces[i];
 
 		//Transform sphere into mesh space
+		//TODO: Handle mesh rotation
 		var spherePosition = vec3.create();
 		vec3.subtract(spherePosition, sphere.position, this.position);
 
@@ -94,37 +101,39 @@ Mesh.prototype.IntersectSphere = function(sphere)
 		var distance = vec3.dot(spherePosition, plane.normal) - plane.offset;
 		distance = Math.abs(distance);
 		if(distance >= sphere.radius)
-		{
+		{	
 			continue;
 		}
 
 		//Get radius on plane
-		//TODO: FIX!
-		var radiusOnPlane = sphere.radius;
+		var radiusOnPlane = Math.sqrt((sphere.radius * sphere.radius) - (distance * distance));
 
 		//Test against triangle edges
-		var output = { intersects: true };
+		var intersects = true;
 		for(var edgeIndex = 0; edgeIndex < 3; ++edgeIndex)
 		{
 			var edgePlane = this.triangleEdges[i][edgeIndex];
 			var edgeDistance = vec3.dot(spherePosition, edgePlane.normal) - edgePlane.offset;
 			if(edgeDistance >= radiusOnPlane)
 			{
-				output.intersects = false;
+				intersects = false;
 				break;
 			}
 		}
 
 		//Produce intersection parameters
-		if(output.intersects)
+		if(intersects)
 		{
-			output.penetration = sphere.radius - distance;
-			output.normal = vec3.clone(plane.normal);
-			vec3.negate(output.normal, output.normal);
-			
-			return output;
+			var penetration = sphere.radius - distance;
+			if((output.penetration === undefined) || (penetration > output.penetration))
+			{
+				output.penetration = penetration;
+				output.normal = vec3.clone(plane.normal);
+				output.intersects = true;
+				vec3.negate(output.normal, output.normal);
+			}
 		}
 	}
 
-    return { intersects: false };
+    return output;
 }

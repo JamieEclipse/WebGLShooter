@@ -53,25 +53,31 @@ Physics.prototype.Update = function(deltaTime)
 					var objectJ = this.objects[j];
                     if(objectJ)
                     {
-                        var intersect = objectI.shape.Intersect(objectJ.shape);
-                        if(intersect.intersects)
-                        {
-                            //Send callbacks
-                            if(objectI.OnCollision !== undefined)
-                            {
-                                objectI.OnCollision(objectJ, intersect);
-                            }
-                            if(objectJ.OnCollision !== undefined)
-                            {
-                                objectJ.OnCollision(objectI, intersect);
-                            }
+						//Use max iteration counts
+						var iterations = Math.max(objectI.shape.iterations, objectJ.shape.iterations);
 
-                            vec3.scaleAndAdd(objectI.shape.position, objectI.shape.position, intersect.normal, intersect.penetration);
-                    
-                            //Remove velocity in -normal direction
-                            var speedAlongNormal = vec3.dot(intersect.normal, objectI.velocity);
-                            vec3.scaleAndAdd(objectI.velocity, objectI.velocity, intersect.normal, Math.max(0, -speedAlongNormal));
-                        }
+						for(var iteration = 0; iteration < iterations; ++iteration)
+						{
+							var intersect = objectI.shape.Intersect(objectJ.shape);
+							if(intersect.intersects)
+							{
+								//Send callbacks
+								if(objectI.OnCollision !== undefined)
+								{
+									objectI.OnCollision(objectJ, intersect);
+								}
+								if(objectJ.OnCollision !== undefined)
+								{
+									objectJ.OnCollision(objectI, intersect);
+								}
+
+								vec3.scaleAndAdd(objectI.shape.position, objectI.shape.position, intersect.normal, intersect.penetration);
+						
+								//Remove velocity in -normal direction
+								var speedAlongNormal = vec3.dot(intersect.normal, objectI.velocity);
+								vec3.scaleAndAdd(objectI.velocity, objectI.velocity, intersect.normal, Math.max(0, -speedAlongNormal));
+							}
+						}
                     }
 				}
             }

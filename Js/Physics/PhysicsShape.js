@@ -3,6 +3,9 @@
 
 function PhysicsShape()
 {
+	//Allow complex shapes to request multiple collision response iterations
+	this.iterations = 1;
+
 	this.Intersect = function(other)
 	{
 		//Use a local intersection function
