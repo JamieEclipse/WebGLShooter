@@ -46,33 +46,140 @@ function Model(gl, data, scale = 1)
 	}
 	else
 	{
-		$.getJSON(data, {}, function(json)
+		$.get(data, {}, function(fileName, contents)
 		{
-			//Copy data
-			for(var name in json)
+			var extension = fileName.split(".").pop();
+			switch(extension)
 			{
-				this[name] = json[name];
+				case "json":
+				this.LoadJson(contents);
+				break;
+				
+				case "obj":
+				this.LoadObj(contents);
+				break;
 			}
 
 			//Apply scale
 			if(this.scale != 1)
 			{
-				for(var i in json.positions)
+				for(var i in this.positions)
 				{
-					json.positions[i] *= this.scale;
+					this.positions[i] *= this.scale;
 				}
 			}
 
 			//Write initial values to buffers
-			this.loaded = true;
 			this.WriteToBuffers(this.gl);
 
 			//Call callbacks
+			this.loaded = true;
 			for(var i in this.loadedCallbacks)
 			{
 				this.loadedCallbacks[i]();
 			}
-		}.bind(this));
+		}.bind(this, data));
+	}
+}
+
+
+Model.prototype.LoadJson = function(data)
+{
+	//Copy data
+	for(var name in data)
+	{
+		this[name] = data[name];
+	}
+}
+
+
+Model.prototype.LoadObj = function(data)
+{
+	//Initialise member arrays
+	this.indices = [];
+	this.positions = [];
+	this.texCoords = [];
+	this.normals = [];
+
+	//Temporary texCoord array - to be translated from separate indices
+	var rawIndices = [];
+	var rawPositions = [];
+	var rawTexCoords = [];
+	var rawNormals = [];
+
+	//Read line by line
+	var lines = data.split("\n");
+
+	//Load vertices, defer faces
+	for(var i in lines)
+	{
+		//Split into tokens
+		var tokens = lines[i].split(/\s/);
+
+		//Comments don't need a space
+		if(tokens[0].startsWith("#"))
+		{
+			continue;
+		}
+		
+		switch(tokens[0])
+		{
+			case "v":
+			rawPositions.push(parseFloat(tokens[1]));
+			rawPositions.push(parseFloat(tokens[2]));
+			rawPositions.push(parseFloat(tokens[3]));
+			break;
+
+			case "vt":
+			rawTexCoords.push(1 - parseFloat(tokens[1]));
+			rawTexCoords.push(1 - parseFloat(tokens[2]));
+			break;
+
+			case "vn":
+			rawNormals.push(parseFloat(tokens[1]));
+			rawNormals.push(parseFloat(tokens[2]));
+			rawNormals.push(parseFloat(tokens[3]));
+			break;
+
+			case "f":
+			for(var j = tokens.length - 1; j > 0; --j)
+			{
+				var vert = tokens[j].split("/");
+				var indexObject =
+				{
+					position: parseInt(vert[0]) - 1,
+					texCoord: parseInt(vert[1]) - 1,
+					normal: parseInt(vert[2]) - 1
+				};
+				
+				rawIndices.push(indexObject);
+			}
+			break;
+		}
+	}
+
+	//Build arrays
+	//TODO: Remove duplicates
+	for(var i = 0; i < rawIndices.length; ++i)
+	{
+		var index = rawIndices[i];
+		
+		//Add index
+		this.indices.push(i);
+
+		//Add position
+		this.positions.push(rawPositions[index.position * 3 + 0]);
+		this.positions.push(rawPositions[index.position * 3 + 1]);
+		this.positions.push(rawPositions[index.position * 3 + 2]);
+
+		//Add texCoord
+		this.texCoords.push(rawTexCoords[index.texCoord * 2 + 0]);
+		this.texCoords.push(rawTexCoords[index.texCoord * 2 + 1]);
+
+		//Add normal
+		this.normals.push(rawNormals[index.normal * 3 + 0]);
+		this.normals.push(rawNormals[index.normal * 3 + 1]);
+		this.normals.push(rawNormals[index.normal * 3 + 2]);
 	}
 }
 

@@ -1,0 +1,11 @@
+{
+	"components": { "transform": "TransformComponent", "model": "ModelComponent", "physics": "PhysicsComponent" },
+	"properties":
+	{
+		"model": "Models/Level1.obj",
+		"texture": "Images/Wall.png",
+		"scale": 1,
+		"physics": [{ "shape": "Mesh" }]
+	}
+
+}
